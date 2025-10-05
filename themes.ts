@@ -26,4 +26,25 @@ export const themes: Theme[] = [
        '--color-primary-action': '#9333ea', // purple-600
     }
   },
+    {
+    id: 'red',
+    name: 'أحمر',
+    colors: {
+       '--color-primary-action': '#dc2626', // red-600
+    }
+  },
+  {
+    id: 'yellow',
+    name: 'أصفر',
+    colors: {
+       '--color-primary-action': '#f59e0b', // amber-500
+    }
+  },
+  {
+    id: 'gray',
+    name: 'داكن',
+    colors: {
+       '--color-primary-action': '#4b5563', // gray-600
+    }
+  },
 ];

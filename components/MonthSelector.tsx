@@ -13,7 +13,7 @@ const MonthSelector: React.FC<MonthSelectorProps> = ({ selectedIndex, onSelectMo
       <select
         value={selectedIndex}
         onChange={(e) => onSelectMonth(Number(e.target.value))}
-        className="block w-full md:w-48 px-4 py-2 pr-8 text-base leading-6 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-150"
+        className="block w-full md:w-48 px-4 py-2 pr-8 text-base leading-6 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ease-in-out duration-150"
         aria-label="Select a month"
       >
         {MONTHS.map((month, index) => (

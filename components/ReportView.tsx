@@ -30,7 +30,7 @@ const ReportItemCard = React.memo<ReportItemCardProps>(({
   return (
     <div className={`printable-item border-b last:border-b-0 pb-4 ${printingItemId === item.id ? 'is-printing' : ''}`}>
       <div className="flex justify-between items-center mb-2">
-        <p className="font-semibold text-lg text-blue-800">{item.activity}</p>
+        <p className="font-semibold text-lg text-primary">{item.activity}</p>
         <p className="text-sm text-gray-600 flex-shrink-0 ml-4">
             المخطط: <span className="font-bold text-xl text-green-700">{item.schedule[selectedMonthIndex]}</span>
         </p>
@@ -234,12 +234,12 @@ const ReportView: React.FC<ReportViewProps> = ({ data, selectedMonthIndex, onWee
     <div id="report-view" className={reportViewClasses} ref={reportContainerRef}>
       <div className="no-print flex justify-between items-center mb-6 pb-4 border-b">
         <h2 className="text-2xl font-bold text-gray-800">
-          تقرير الأنشطة لشهر: <span className="text-blue-600">{monthName}</span>
+          تقرير الأنشطة لشهر: <span className="text-primary">{monthName}</span>
         </h2>
         <div className="flex items-center gap-2">
             <button
             onClick={handlePrintFullReport}
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center space-x-2 space-x-reverse"
+            className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary flex items-center space-x-2 space-x-reverse"
             >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clipRule="evenodd" />
@@ -266,7 +266,7 @@ const ReportView: React.FC<ReportViewProps> = ({ data, selectedMonthIndex, onWee
                 <div className="space-y-3">
                     <div className="flex justify-between items-center bg-white p-2 rounded-md">
                     <span className="text-gray-600">عدد الأنشطة المخططة:</span>
-                    <span className="font-bold text-xl text-blue-600">{totalActivities}</span>
+                    <span className="font-bold text-xl text-primary">{totalActivities}</span>
                     </div>
                     <div className="flex justify-between items-center bg-white p-2 rounded-md">
                     <span className="text-gray-600">إجمالي المهام المخططة:</span>

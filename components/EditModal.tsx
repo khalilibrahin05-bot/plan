@@ -50,21 +50,21 @@ const EditModal: React.FC<EditModalProps> = ({ item, isOpen, onClose, onSave }) 
         <form onSubmit={handleSubmit} id="edit-form" className="flex-grow overflow-y-auto p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">النشاط</label>
-            <input type="text" name="activity" value={formData.activity} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            <input type="text" name="activity" value={formData.activity} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">المؤشرات</label>
-            <textarea name="indicator" value={formData.indicator} onChange={handleChange} rows={3} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            <textarea name="indicator" value={formData.indicator} onChange={handleChange} rows={3} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">المخطط</label>
-              <input type="number" name="planned" value={formData.planned ?? ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+              <input type="number" name="planned" value={formData.planned ?? ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" />
             </div>
              <div>
               <label className="block text-sm font-medium text-gray-700">عدد المؤشرات</label>
-              <input type="number" name="indicatorCount" value={formData.indicatorCount ?? ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+              <input type="number" name="indicatorCount" value={formData.indicatorCount ?? ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" />
             </div>
           </div>
           
@@ -79,7 +79,7 @@ const EditModal: React.FC<EditModalProps> = ({ item, isOpen, onClose, onSave }) 
                     type="number"
                     value={formData.schedule[index] ?? ''}
                     onChange={(e) => handleScheduleChange(index, e.target.value)}
-                    className="mt-1 block w-full text-center rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="mt-1 block w-full text-center rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                   />
                 </div>
               ))}
@@ -91,7 +91,7 @@ const EditModal: React.FC<EditModalProps> = ({ item, isOpen, onClose, onSave }) 
           <button type="button" onClick={onClose} className="ml-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
             إلغاء
           </button>
-          <button type="submit" form="edit-form" onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <button type="submit" form="edit-form" onClick={handleSubmit} className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
             حفظ التغييرات
           </button>
         </div>

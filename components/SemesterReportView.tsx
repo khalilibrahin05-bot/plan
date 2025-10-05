@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { PlanItem } from '../types';
 import { MONTHS } from '../constants';
@@ -50,11 +51,11 @@ const SemesterReportView: React.FC<SemesterReportViewProps> = ({ data, selectedM
     <div id="report-view" className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-lg">
        <div className="no-print flex justify-between items-center mb-6 pb-4 border-b">
         <h2 className="text-2xl font-bold text-gray-800">
-          التقرير الفصلي: <span className="text-blue-600">{semesterMonthNames.join(', ')}</span>
+          التقرير الفصلي: <span className="text-primary">{semesterMonthNames.join(', ')}</span>
         </h2>
         <button
           onClick={handlePrint}
-          className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center space-x-2 space-x-reverse"
+          className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary flex items-center space-x-2 space-x-reverse"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clipRule="evenodd" />
@@ -76,7 +77,7 @@ const SemesterReportView: React.FC<SemesterReportViewProps> = ({ data, selectedM
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">إجمالي الأنشطة المخططة:</span>
-              <span className="font-bold text-xl text-blue-600">{totalSemesterActivities}</span>
+              <span className="font-bold text-xl text-primary">{totalSemesterActivities}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">إجمالي المهام المخططة:</span>
@@ -87,7 +88,7 @@ const SemesterReportView: React.FC<SemesterReportViewProps> = ({ data, selectedM
          <div className="bg-gray-100 p-4 rounded-lg shadow">
           <h4 className="font-bold text-gray-700 mb-2">ملاحظات</h4>
           <textarea
-            className="w-full h-24 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="w-full h-24 p-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
             placeholder="أضف ملاحظاتك هنا للطباعة..."
           ></textarea>
         </div>
@@ -111,7 +112,7 @@ const SemesterReportView: React.FC<SemesterReportViewProps> = ({ data, selectedM
                     <div className="border border-t-0 rounded-b-lg p-4">
                       {month.groupedData[domain].map(item => (
                          <div key={item.id} className="grid grid-cols-1 md:grid-cols-6 gap-x-4 gap-y-1 py-2 border-b last:border-0">
-                            <p className="md:col-span-3 font-semibold text-blue-700">{item.activity}</p>
+                            <p className="md:col-span-3 font-semibold text-primary/80">{item.activity}</p>
                             <div className="md:col-span-3 grid grid-cols-2 gap-x-4">
                               <p><span className="font-semibold text-gray-500">عدد المؤشر:</span> {item.indicatorCount ?? '-'}</p>
                               <p><span className="font-semibold text-gray-500">العدد للشهر:</span> <span className="font-bold text-green-600">{item.schedule[month.monthIndex]}</span></p>

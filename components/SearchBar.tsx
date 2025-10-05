@@ -17,7 +17,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ query, onQueryChange }) => {
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
         placeholder="ابحث في الأنشطة، الأهداف، المؤشرات..."
-        className="block w-full py-2 pl-3 pr-10 text-base bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-150"
+        className="block w-full py-2 pl-3 pr-10 text-base bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ease-in-out duration-150"
         aria-label="Search activities"
       />
     </div>

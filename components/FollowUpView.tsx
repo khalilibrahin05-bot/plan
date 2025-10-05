@@ -1,4 +1,6 @@
 
+
+
 import React, { useMemo, useState } from 'react';
 import { PlanItem } from '../types';
 import { getDomainColor } from '../colors';
@@ -21,7 +23,7 @@ const MiniTimeline = ({ schedule }: { schedule: (number | null)[] }) => (
             <div
                 key={index}
                 className={`w-3 h-5 rounded-sm transition-colors ${
-                    schedule[index] ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-200 hover:bg-gray-300'
+                    schedule[index] ? 'bg-primary hover:bg-primary/80' : 'bg-gray-200 hover:bg-gray-300'
                 }`}
                 title={`${month}: ${schedule[index] ?? 'لا يوجد'}`}
             ></div>
@@ -105,7 +107,7 @@ const FollowUpView: React.FC<FollowUpViewProps> = ({ data }) => {
         </h2>
         <button
           onClick={handlePrint}
-          className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center space-x-2 space-x-reverse"
+          className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary flex items-center space-x-2 space-x-reverse"
         >
           <PrintIcon />
           <span>طباعة</span>
@@ -157,7 +159,7 @@ const FollowUpView: React.FC<FollowUpViewProps> = ({ data }) => {
           {filterButtons.map(btn => (
               <button key={btn.key}
                   onClick={() => setFilter(btn.key as any)}
-                  className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${filter === btn.key ? 'bg-blue-600 text-white shadow' : 'bg-white hover:bg-blue-50 text-gray-700'}`}
+                  className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${filter === btn.key ? 'bg-primary text-white shadow' : 'bg-white hover:bg-primary/10 text-gray-700'}`}
               >
                   {btn.label}
               </button>
@@ -183,6 +185,7 @@ const FollowUpView: React.FC<FollowUpViewProps> = ({ data }) => {
                   <div key={objective}>
                     <h4 className="text-md font-semibold text-gray-700 mb-2 p-2 bg-gray-100 rounded-md">{objective}</h4>
                     <ul className="space-y-2">
+                      {/* FIX: Changed `activity.map` to `activities.map` to correctly reference the destructured array. */}
                       {activities.map(activity => (
                         <li key={activity.id} className="flex flex-col sm:flex-row justify-between sm:items-center p-2 rounded-md hover:bg-gray-50 gap-2">
                           <span className="text-gray-800 flex-grow">{activity.activity}</span>

@@ -65,7 +65,7 @@ const PlanTableRow: React.FC<PlanTableRowProps> = React.memo(({
       <td className="px-2 py-2 text-center no-print">
         <button
           onClick={() => onEdit(item)}
-          className="text-blue-600 hover:text-blue-800 transition-transform duration-200 hover:scale-110"
+          className="text-primary hover:text-primary/80 transition-transform duration-200 hover:scale-110"
           aria-label={`تعديل ${item.activity}`}
         >
           <EditIcon />

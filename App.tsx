@@ -8,7 +8,7 @@ import FontControls from './components/FontControls';
 import Footer from './components/Footer';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { themes } from './themes';
-import { CogIcon, PrintIcon } from './components/Icons';
+import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon } from './components/Icons';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy-loaded components
@@ -22,15 +22,18 @@ const ToolsView = lazy(() => import('./components/ToolsView'));
 const FollowUpView = lazy(() => import('./components/FollowUpView'));
 const AIToolsView = lazy(() => import('./components/AIToolsView'));
 const FrameworkView = lazy(() => import('./components/FrameworkView'));
+const SupervisorsView = lazy(() => import('./components/SupervisorsView'));
+const SummaryView = lazy(() => import('./components/SummaryView'));
 const EditModal = lazy(() => import('./components/EditModal'));
 const PrintSettingsModal = lazy(() => import('./components/PrintSettingsModal'));
 
 
-type View = 'table' | 'report' | 'semester' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics';
+type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors';
 const LOCAL_STORAGE_KEY = 'educationalPlanData';
 const FONT_SETTINGS_KEY = 'educationalPlanFontSettings';
 const PRINT_SETTINGS_KEY = 'educationalPlanPrintSettings';
 const THEME_KEY = 'educationalPlanTheme';
+const SUPERVISORS_PLANS_KEY = 'educationalSupervisorsPlansData';
 
 const fontSizes = ['text-sm', 'text-base', 'text-lg', 'text-xl'];
 const fontFamilies = [
@@ -99,12 +102,26 @@ const App: React.FC = () => {
     }
   });
 
+  const [supervisorsPlans, setSupervisorsPlans] = useState<{[key: string]: PlanItem[]}> (() => {
+      try {
+          const savedData = localStorage.getItem(SUPERVISORS_PLANS_KEY);
+          if (savedData) {
+              return JSON.parse(savedData);
+          }
+      } catch (error) {
+          console.error("Failed to parse supervisors' plans data from localStorage", error);
+      }
+      return {};
+  });
+
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number>(0);
   const [editingItem, setEditingItem] = useState<PlanItem | null>(null);
   const [viewMode, setViewMode] = useState<View>('table');
   const [searchQuery, setSearchQuery] = useState('');
   const [isPrintSettingsModalOpen, setIsPrintSettingsModalOpen] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced'>('idle');
 
 
   useEffect(() => {
@@ -130,6 +147,14 @@ const App: React.FC = () => {
       console.error("Failed to save print settings to localStorage", error);
     }
   }, [printSettings]);
+  
+  useEffect(() => {
+    try {
+      localStorage.setItem(SUPERVISORS_PLANS_KEY, JSON.stringify(supervisorsPlans));
+    } catch (error) {
+      console.error("Failed to save supervisors' plans data to localStorage", error);
+    }
+  }, [supervisorsPlans]);
 
   useEffect(() => {
     const applyTheme = (id: string) => {
@@ -147,6 +172,68 @@ const App: React.FC = () => {
 
     applyTheme(themeId);
   }, [themeId]);
+  
+  const handleRefreshData = useCallback(() => {
+    if (window.confirm("هل أنت متأكد من رغبتك في تحديث البيانات؟ سيتم فقدان جميع التغييرات والعودة إلى الخطة الأصلية.")) {
+      setPlanData(initialPlanData);
+      setSupervisorsPlans({});
+      // This will trigger the useEffects to save the initial state back to localStorage
+    }
+  }, []);
+
+  const handleManualSave = useCallback(() => {
+    setSaveStatus('saving');
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(planData));
+      localStorage.setItem(FONT_SETTINGS_KEY, JSON.stringify(fontSettings));
+      localStorage.setItem(PRINT_SETTINGS_KEY, JSON.stringify(printSettings));
+      localStorage.setItem(THEME_KEY, themeId);
+      localStorage.setItem(SUPERVISORS_PLANS_KEY, JSON.stringify(supervisorsPlans));
+      
+      setTimeout(() => {
+        setSaveStatus('saved');
+        setTimeout(() => {
+          setSaveStatus('idle');
+        }, 1500); // Revert to idle after 1.5 seconds
+      }, 500); // Show saving for 0.5 seconds
+    } catch (error) {
+      console.error("Failed to manually save data to localStorage", error);
+      setSaveStatus('idle'); // Revert on error
+    }
+  }, [planData, fontSettings, printSettings, themeId, supervisorsPlans]);
+  
+  const handleSyncData = useCallback(() => {
+    setSyncStatus('syncing');
+    try {
+      // Plan Data
+      const savedPlanData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedPlanData) setPlanData(JSON.parse(savedPlanData));
+
+      // Supervisors Plans
+      const savedSupervisorsPlans = localStorage.getItem(SUPERVISORS_PLANS_KEY);
+      if (savedSupervisorsPlans) setSupervisorsPlans(JSON.parse(savedSupervisorsPlans));
+
+      // Font Settings
+      const savedFontSettings = localStorage.getItem(FONT_SETTINGS_KEY);
+      if (savedFontSettings) setFontSettings(JSON.parse(savedFontSettings));
+      
+      // Print Settings
+      const savedPrintSettings = localStorage.getItem(PRINT_SETTINGS_KEY);
+      if (savedPrintSettings) setPrintSettings(JSON.parse(savedPrintSettings));
+      
+      // Theme
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      if (savedTheme) setThemeId(savedTheme);
+
+      setTimeout(() => {
+        setSyncStatus('synced');
+        setTimeout(() => setSyncStatus('idle'), 1500);
+      }, 500);
+    } catch (error) {
+      console.error("Failed to sync data from localStorage", error);
+      setSyncStatus('idle');
+    }
+  }, []);
 
   const handleThemeChange = useCallback((id: string) => {
       setThemeId(id);
@@ -207,6 +294,9 @@ const App: React.FC = () => {
     setIsPrintSettingsModalOpen(false);
   }, []);
 
+  const handleUpdateSupervisorsPlans = useCallback((newPlans: {[key: string]: PlanItem[]}) => {
+    setSupervisorsPlans(newPlans);
+  }, []);
 
   const filteredData = useMemo(() => {
     if (!searchQuery) {
@@ -249,6 +339,8 @@ const App: React.FC = () => {
             selectedMonthIndex={selectedMonthIndex}
           />
         );
+      case 'summary':
+        return <SummaryView planData={planData} supervisorsPlans={supervisorsPlans} />;
       case 'statistics':
         return <StatisticsView data={filteredData} />;
       case 'unified-glossary':
@@ -263,6 +355,8 @@ const App: React.FC = () => {
         return <AIToolsView />;
       case 'framework':
         return <FrameworkView />;
+      case 'supervisors':
+        return <SupervisorsView plans={supervisorsPlans} onUpdatePlans={handleUpdateSupervisorsPlans} />;
       default:
         return null;
     }
@@ -293,6 +387,36 @@ const App: React.FC = () => {
                 <SearchBar query={searchQuery} onQueryChange={handleSearchChange} />
              </div>
              <div className="flex items-center gap-2 flex-wrap">
+                 <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+                    <button
+                        onClick={handleManualSave}
+                        className={`flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm transition-all duration-300 ${saveStatus === 'saved' ? 'bg-green-500 text-white' : 'hover:bg-gray-200'}`}
+                        title="حفظ التغييرات"
+                        disabled={saveStatus !== 'idle'}
+                    >
+                        {saveStatus === 'idle' && <><SaveDataIcon /><span>حفظ</span></>}
+                        {saveStatus === 'saving' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
+                        {saveStatus === 'saved' && <><CheckIcon /><span>تم الحفظ</span></>}
+                    </button>
+                    <button
+                        onClick={handleSyncData}
+                        className={`flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm transition-all duration-300 ${syncStatus === 'synced' ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'}`}
+                        title="مزامنة البيانات من التخزين المحلي (مفيد عند فتح التطبيق في أكثر من نافذة)"
+                        disabled={syncStatus !== 'idle'}
+                    >
+                        {syncStatus === 'idle' && <><SyncIcon /><span>مزامنة</span></>}
+                        {syncStatus === 'syncing' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
+                        {syncStatus === 'synced' && <><CheckIcon /><span>تمت المزامنة</span></>}
+                    </button>
+                    <button
+                        onClick={handleRefreshData}
+                        className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-red-600 hover:text-red-700"
+                        title="تحديث البيانات للخطة الأصلية"
+                    >
+                        <RefreshIcon />
+                        <span>تحديث</span>
+                    </button>
+                </div>
                 {viewMode === 'table' && (
                   <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
                     <button onClick={() => setIsPrinting(true)} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm" title="طباعة الجدول">

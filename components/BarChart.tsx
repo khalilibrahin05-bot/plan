@@ -25,7 +25,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, title }) => {
           <div key={index} className="flex flex-col items-center flex-1 min-w-0">
             <div className="relative w-full h-full flex items-end justify-center">
               <div
-                className="w-3/4 max-w-[50px] bg-blue-400 hover:bg-blue-500 transition-all duration-300 rounded-t-md"
+                className="w-3/4 max-w-[50px] bg-primary/70 hover:bg-primary transition-all duration-300 rounded-t-md"
                 style={{ height: maxValue > 0 ? `${(item.value / maxValue) * 100}%` : '0%' }}
                 title={`${item.label}: ${item.value}`}
               >

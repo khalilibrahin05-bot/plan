@@ -179,3 +179,42 @@ export const ChartPieIcon: React.FC<IconProps> = ({ className = "h-6 w-6" }) => 
     <path fillRule="evenodd" d="M12.75 3a.75.75 0 01.75-.75 8.25 8.25 0 018.25 8.25.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75V3z" clipRule="evenodd" />
   </svg>
 );
+
+export const UserGroupIcon: React.FC<IconProps> = ({ className = "h-6 w-6" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM1.5 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.12v-.003zM12.375 16.125a5.625 5.625 0 0111.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.12v-.003z" />
+  </svg>
+);
+
+export const SaveDataIcon: React.FC<IconProps> = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M3 5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25v13.5A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75V5.25zM12 18a.75.75 0 00.75-.75V15.75a.75.75 0 00-1.5 0v1.5a.75.75 0 00.75.75z" />
+    <path d="M5.25 5.25a.75.75 0 01.75-.75H12a.75.75 0 010 1.5H6a.75.75 0 01-.75-.75z" />
+  </svg>
+);
+
+export const RefreshIcon: React.FC<IconProps> = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path fillRule="evenodd" d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-4.5a.75.75 0 000 1.5h6a.75.75 0 00.75-.75v-6a.75.75 0 00-1.5 0v4.19l-2.121-2.121A9 9 0 006.035 10.5H1.5a.75.75 0 000 1.5h3.255a.75.75 0 010-1.5H6.035a7.5 7.5 0 01-.28-4.441z" clipRule="evenodd" />
+    <path fillRule="evenodd" d="M19.245 13.941a7.5 7.5 0 01-12.548 3.364l-1.903-1.903h4.5a.75.75 0 000-1.5h-6a.75.75 0 00-.75.75v6a.75.75 0 001.5 0v-4.19l2.121 2.121A9 9 0 0017.965 13.5h4.5a.75.75 0 000-1.5h-3.255a.75.75 0 010 1.5h-1.47a7.5 7.5 0 01.28 4.441z" clipRule="evenodd" />
+  </svg>
+);
+
+export const CheckIcon: React.FC<IconProps> = ({ className = "h-5 w-5" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
+    </svg>
+);
+
+export const DocumentTextIcon: React.FC<IconProps> = ({ className = "h-6 w-6" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path fillRule="evenodd" d="M5.625 1.5A3.375 3.375 0 002.25 4.875v14.25A3.375 3.375 0 005.625 22.5h12.75A3.375 3.375 0 0021.75 19.125V4.875A3.375 3.375 0 0018.375 1.5H5.625zM9.75 6a.75.75 0 01.75.75v.008l.004.002.002.002.002.002.002.002h3.5a.75.75 0 010 1.5h-3.5a.75.75 0 01-.75-.75V6.75A.75.75 0 019.75 6zm-1.5 3a.75.75 0 000 1.5h6.75a.75.75 0 000-1.5H8.25zm.75 2.25a.75.75 0 01.75.75v.008l.004.002.002.002.002.002.002.002h3.5a.75.75 0 010 1.5h-3.5a.75.75 0 01-.75-.75v-.008a.75.75 0 01.75-.75z" clipRule="evenodd" />
+  </svg>
+);
+
+export const SyncIcon: React.FC<IconProps> = ({ className = "h-5 w-5" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M12 1.5a.75.75 0 01.75.75V12.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V2.25A.75.75 0 0112 1.5z" />
+      <path d="M3.75 18a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5H3.75z" />
+    </svg>
+);

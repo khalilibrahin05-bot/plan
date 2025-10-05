@@ -79,7 +79,7 @@ const PrintSettingsModal: React.FC<PrintSettingsModalProps> = ({ isOpen, onClose
                   value="landscape"
                   checked={settings.orientation === 'landscape'}
                   onChange={handleOrientationChange}
-                  className="form-radio text-blue-600"
+                  className="form-radio text-primary"
                 />
                 <span className="mr-2 text-gray-700">أفقي (Landscape)</span>
               </label>
@@ -90,7 +90,7 @@ const PrintSettingsModal: React.FC<PrintSettingsModalProps> = ({ isOpen, onClose
                   value="portrait"
                   checked={settings.orientation === 'portrait'}
                   onChange={handleOrientationChange}
-                  className="form-radio text-blue-600"
+                  className="form-radio text-primary"
                 />
                 <span className="mr-2 text-gray-700">عمودي (Portrait)</span>
               </label>
@@ -108,7 +108,7 @@ const PrintSettingsModal: React.FC<PrintSettingsModalProps> = ({ isOpen, onClose
                     name={key}
                     checked={settings.columns[key]}
                     onChange={handleColumnChange}
-                    className="form-checkbox h-5 w-5 text-blue-600 rounded"
+                    className="form-checkbox h-5 w-5 text-primary rounded"
                   />
                   <span className="mr-3 text-gray-800">{columnLabels[key]}</span>
                 </label>
@@ -121,7 +121,7 @@ const PrintSettingsModal: React.FC<PrintSettingsModalProps> = ({ isOpen, onClose
           <button type="button" onClick={onClose} className="ml-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
             إلغاء
           </button>
-          <button type="submit" form="print-settings-form" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <button type="submit" form="print-settings-form" className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
             حفظ الإعدادات
           </button>
         </div>
