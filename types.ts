@@ -73,4 +73,5 @@ export interface User {
   id: string;
   name: string;
   permissions: UserPermissions;
+  ratings: number[];
 }

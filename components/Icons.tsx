@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface IconProps {
@@ -251,4 +252,17 @@ export const KeyIcon: React.FC<IconProps> = ({ className = "h-5 w-5" }) => (
         <path fillRule="evenodd" d="M8.25 3.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM8.25 9a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5H8.25z" clipRule="evenodd" />
         <path d="M3 8.625a3.75 3.75 0 013.75-3.75h.375a.75.75 0 010 1.5H6.75A2.25 2.25 0 004.5 8.625v10.125A2.25 2.25 0 006.75 21h10.5A2.25 2.25 0 0019.5 18.75V8.625A2.25 2.25 0 0017.25 6.375h-.375a.75.75 0 010-1.5h.375A3.75 3.75 0 0121 8.625v10.125A3.75 3.75 0 0117.25 22.5H6.75A3.75 3.75 0 013 18.75V8.625z" />
     </svg>
+);
+
+export const ImportIcon: React.FC<IconProps> = ({ className = "h-5 w-5" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 011.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
+        <path d="M3.75 12a.75.75 0 01.75.75v6c0 .414.336.75.75.75h13.5a.75.75 0 00.75-.75v-6a.75.75 0 011.5 0v6A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75v-6a.75.75 0 01.75-.75z" />
+    </svg>
+);
+
+export const StarIcon: React.FC<IconProps & { filled?: boolean }> = ({ className = "h-5 w-5", filled = false }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.5} className={className}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+  </svg>
 );
