@@ -245,3 +245,10 @@ export const UploadIcon: React.FC<IconProps> = ({ className = "h-6 w-6" }) => (
         <path d="M3 12a.75.75 0 00-1.5 0v6a3 3 0 003 3h12a3 3 0 003-3v-6a.75.75 0 00-1.5 0v6a1.5 1.5 0 01-1.5 1.5H6a1.5 1.5 0 01-1.5-1.5v-6z" />
     </svg>
 );
+
+export const KeyIcon: React.FC<IconProps> = ({ className = "h-5 w-5" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M8.25 3.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM8.25 9a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5H8.25z" clipRule="evenodd" />
+        <path d="M3 8.625a3.75 3.75 0 013.75-3.75h.375a.75.75 0 010 1.5H6.75A2.25 2.25 0 004.5 8.625v10.125A2.25 2.25 0 006.75 21h10.5A2.25 2.25 0 0019.5 18.75V8.625A2.25 2.25 0 0017.25 6.375h-.375a.75.75 0 010-1.5h.375A3.75 3.75 0 0121 8.625v10.125A3.75 3.75 0 0117.25 22.5H6.75A3.75 3.75 0 013 18.75V8.625z" />
+    </svg>
+);

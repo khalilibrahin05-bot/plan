@@ -70,6 +70,13 @@ const PlanTermsTab: React.FC<{ data: PlanItem[], searchTerm: string }> = ({ data
     setIsLoading(true);
     setError('');
     setAnalysis('');
+
+    if (!navigator.onLine) {
+        setError("هذه الميزة تتطلب اتصالاً بالإنترنت.");
+        setIsLoading(false);
+        return;
+    }
+    
     if (!process.env.API_KEY) {
       setError("مفتاح الواجهة البرمجية (API Key) غير موجود.");
       setIsLoading(false);
@@ -287,6 +294,12 @@ const AcademicGlossaryContainer: React.FC<{ searchTerm: string }> = ({ searchTer
         setIsLoading(true);
         setError('');
         setAnalysis('');
+
+        if (!navigator.onLine) {
+            setError("هذه الميزة تتطلب اتصالاً بالإنترنت.");
+            setIsLoading(false);
+            return;
+        }
 
         if (!process.env.API_KEY) {
             setError("مفتاح الواجهة البرمجية (API Key) غير موجود.");

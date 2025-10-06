@@ -17,6 +17,12 @@ const AIToolsView: React.FC = () => {
         setError('');
         setResult('');
 
+        if (!navigator.onLine) {
+            setError("هذه الميزة تتطلب اتصالاً بالإنترنت.");
+            setIsLoading(false);
+            return;
+        }
+
         if (!process.env.API_KEY) {
             setError("مفتاح الواجهة البرمجية (API Key) غير موجود. يرجى التأكد من إعداده.");
             setIsLoading(false);

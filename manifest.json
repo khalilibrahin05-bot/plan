@@ -1,0 +1,16 @@
+{
+  "name": "مدير خطة الإشراف التربوي",
+  "short_name": "خطة الإشراف",
+  "description": "An interactive web application to view, manage, and edit the educational supervision plan for the academic year. Users can filter activities by month and edit plan details.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
