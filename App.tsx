@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense, useRef } from 'react';
 import { PlanItem, PrintSettings } from './types';
 import { initialPlanData } from './data';
 import MonthSelector from './components/MonthSelector';
@@ -8,7 +8,7 @@ import FontControls from './components/FontControls';
 import Footer from './components/Footer';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { themes } from './themes';
-import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon } from './components/Icons';
+import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon, GraduationCapIcon, UploadIcon, TrashIcon } from './components/Icons';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy-loaded components
@@ -32,6 +32,7 @@ const PrintSettingsModal = lazy(() => import('./components/PrintSettingsModal'))
 
 export type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors' | 'control-panel';
 const LOCAL_STORAGE_KEY = 'educationalPlanData';
+const LOGO_STORAGE_KEY = 'educationalPlanLogo';
 const FONT_SETTINGS_KEY = 'educationalPlanFontSettings';
 const PRINT_SETTINGS_KEY = 'educationalPlanPrintSettings';
 const THEME_KEY = 'educationalPlanTheme';
@@ -124,6 +125,8 @@ const App: React.FC = () => {
   const [isPrinting, setIsPrinting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced'>('idle');
+  const [logoSrc, setLogoSrc] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
 
   useEffect(() => {
@@ -174,6 +177,17 @@ const App: React.FC = () => {
 
     applyTheme(themeId);
   }, [themeId]);
+
+  useEffect(() => {
+    try {
+        const savedLogo = localStorage.getItem(LOGO_STORAGE_KEY);
+        if (savedLogo) {
+            setLogoSrc(savedLogo);
+        }
+    } catch (error) {
+        console.error("Failed to load logo from localStorage", error);
+    }
+  }, []);
   
   const handleRefreshData = useCallback(() => {
     if (window.confirm("هل أنت متأكد من رغبتك في تحديث البيانات؟ سيتم فقدان جميع التغييرات والعودة إلى الخطة الأصلية.")) {
@@ -226,6 +240,10 @@ const App: React.FC = () => {
       // Theme
       const savedTheme = localStorage.getItem(THEME_KEY);
       if (savedTheme) setThemeId(savedTheme);
+      
+      // Logo
+      const savedLogo = localStorage.getItem(LOGO_STORAGE_KEY);
+      if (savedLogo) setLogoSrc(savedLogo);
 
       setTimeout(() => {
         setSyncStatus('synced');
@@ -234,6 +252,35 @@ const App: React.FC = () => {
     } catch (error) {
       console.error("Failed to sync data from localStorage", error);
       setSyncStatus('idle');
+    }
+  }, []);
+
+  const handleLogoChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result as string;
+            try {
+                localStorage.setItem(LOGO_STORAGE_KEY, base64String);
+                setLogoSrc(base64String);
+            } catch (error) {
+                console.error("Failed to save logo to localStorage", error);
+                alert('فشل حفظ الشعار. قد تكون مساحة التخزين ممتلئة.');
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+  }, []);
+
+  const handleRemoveLogo = useCallback(() => {
+    if (window.confirm("هل أنت متأكد من رغبتك في إزالة الشعار؟")) {
+        try {
+            localStorage.removeItem(LOGO_STORAGE_KEY);
+            setLogoSrc(null);
+        } catch (error) {
+            console.error("Failed to remove logo from localStorage", error);
+        }
     }
   }, []);
 
@@ -352,9 +399,44 @@ const App: React.FC = () => {
       <header className="bg-white shadow-md sticky top-0 z-20 no-print">
         <div className="container mx-auto px-4 py-4 space-y-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <h1 className="text-xl lg:text-2xl font-bold text-gray-700 text-center md:text-right">
-              {viewMode === 'dashboard' ? 'لوحة التحكم الرئيسية' : 'خطة قسم الإشراف التربوي للعام الدراسي ٢٠٢٥م-٢٠٢٦م / ١٤٤٧هـ'}
-            </h1>
+             <div className="flex items-center gap-4">
+                <div className="relative group flex-shrink-0">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleLogoChange}
+                        className="hidden"
+                        accept="image/png, image/jpeg, image/svg+xml"
+                    />
+                    {logoSrc ? (
+                        <img src={logoSrc} alt="شعار المدرسة" className="h-14 w-14 object-contain rounded-full bg-white shadow-sm" />
+                    ) : (
+                        <div className="h-14 w-14 flex items-center justify-center bg-gray-200 rounded-full">
+                            <GraduationCapIcon className="h-8 w-8 text-gray-500" />
+                        </div>
+                    )}
+                    <div 
+                        className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-full transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer" 
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <button className="opacity-0 group-hover:opacity-100 text-white p-1" title="تغيير الشعار">
+                            <UploadIcon />
+                        </button>
+                        {logoSrc && (
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); handleRemoveLogo(); }} 
+                                className="opacity-0 group-hover:opacity-100 text-white p-1" 
+                                title="إزالة الشعار"
+                            >
+                                <TrashIcon />
+                            </button>
+                        )}
+                    </div>
+                </div>
+                <h1 className="text-xl lg:text-2xl font-bold text-gray-700 text-center md:text-right">
+                {viewMode === 'dashboard' ? 'لوحة التحكم الرئيسية' : 'خطة قسم الإشراف التربوي للعام الدراسي ٢٠٢٥م-٢٠٢٦م / ١٤٤٧هـ'}
+                </h1>
+            </div>
              {viewMode !== 'dashboard' && (
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                     <button onClick={() => setViewMode('dashboard')} className="flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary font-semibold rounded-md hover:bg-primary/20" title="العودة للوحة التحكم">

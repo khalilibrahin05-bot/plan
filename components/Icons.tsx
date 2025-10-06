@@ -231,3 +231,17 @@ export const ShieldCheckIcon: React.FC<IconProps> = ({ className = "h-6 w-6" }) 
         <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3V12.75a3 3 0 00-3-3v-3A5.25 5.25 0 0012 1.5zm-3.75 5.25v3a3 3 0 003 3h1.5a3 3 0 003-3v-3A3.75 3.75 0 0012 3a3.75 3.75 0 00-3.75 3.75zm6.75 8.25a.75.75 0 000-1.5h-4.5a.75.75 0 000 1.5h4.5z" clipRule="evenodd" />
     </svg>
 );
+
+export const GraduationCapIcon: React.FC<IconProps> = ({ className = "h-6 w-6" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M11.721 1.751a.75.75 0 01.558 0l10.5 6.062a.75.75 0 010 1.322l-10.5 6.062a.75.75 0 01-.558 0L1.22 9.135a.75.75 0 010-1.322L11.72 1.75z" />
+        <path d="M12 15.063a.75.75 0 01.393.099l3.75 2.165a.75.75 0 010 1.322l-3.75 2.165a.75.75 0 01-.786 0l-3.75-2.165a.75.75 0 010-1.322l3.75-2.165A.75.75 0 0112 15.063zM14.625 15v.038a.75.75 0 01-.393.658l-3.75 2.166a.75.75 0 01-.786 0l-3.75-2.166a.75.75 0 01-.393-.658V15a.75.75 0 01.393-.658l3.75-2.166a.75.75 0 01.786 0l3.75 2.166A.75.75 0 0114.625 15z" />
+    </svg>
+);
+
+export const UploadIcon: React.FC<IconProps> = ({ className = "h-6 w-6" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M10.5 3.75a.75.75 0 00-1.5 0v6.19L6.47 7.47a.75.75 0 00-1.06 1.06l4.5 4.5a.75.75 0 001.06 0l4.5-4.5a.75.75 0 00-1.06-1.06L12 9.94V3.75a.75.75 0 00-1.5 0z" />
+        <path d="M3 12a.75.75 0 00-1.5 0v6a3 3 0 003 3h12a3 3 0 003-3v-6a.75.75 0 00-1.5 0v6a1.5 1.5 0 01-1.5 1.5H6a1.5 1.5 0 01-1.5-1.5v-6z" />
+    </svg>
+);
