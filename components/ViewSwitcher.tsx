@@ -11,10 +11,11 @@ import {
     WrenchScrewdriverIcon,
     LibraryIcon,
     ChartPieIcon,
-    UserGroupIcon
+    UserGroupIcon,
+    ShieldCheckIcon
 } from './Icons';
+import { View } from '../App';
 
-type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors';
 
 interface ViewSwitcherProps {
   currentView: View;
@@ -34,6 +35,7 @@ const views = [
     { view: 'ai-tools', icon: <SparklesIcon />, title: 'أدوات الذكاء الاصطناعي' },
     { view: 'events', icon: <CalendarIcon />, title: 'المناسبات' },
     { view: 'tools', icon: <WrenchScrewdriverIcon />, title: 'أهم الأدوات' },
+    { view: 'control-panel', icon: <ShieldCheckIcon />, title: 'لوحة التحكم' },
 ];
 
 const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewChange }) => {

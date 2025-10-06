@@ -61,3 +61,16 @@ export interface ReportInfoData {
   strengths: StrengthImpact[];
   recommendations: Recommendation[];
 }
+
+export interface UserPermissions {
+  canEditPlan: boolean;
+  canPrintReports: boolean;
+  canAccessAITools: boolean;
+  canManageUsers: boolean;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  permissions: UserPermissions;
+}

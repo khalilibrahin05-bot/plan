@@ -8,10 +8,11 @@ import FontControls from './components/FontControls';
 import Footer from './components/Footer';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { themes } from './themes';
-import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon } from './components/Icons';
+import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon } from './components/Icons';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy-loaded components
+const Dashboard = lazy(() => import('./components/Dashboard'));
 const PlanTable = lazy(() => import('./components/PlanTable'));
 const ReportView = lazy(() => import('./components/ReportView'));
 const SemesterReportView = lazy(() => import('./components/SemesterReportView'));
@@ -24,11 +25,12 @@ const AIToolsView = lazy(() => import('./components/AIToolsView'));
 const FrameworkView = lazy(() => import('./components/FrameworkView'));
 const SupervisorsView = lazy(() => import('./components/SupervisorsView'));
 const SummaryView = lazy(() => import('./components/SummaryView'));
+const ControlPanelView = lazy(() => import('./components/ControlPanelView'));
 const EditModal = lazy(() => import('./components/EditModal'));
 const PrintSettingsModal = lazy(() => import('./components/PrintSettingsModal'));
 
 
-type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors';
+export type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors' | 'control-panel';
 const LOCAL_STORAGE_KEY = 'educationalPlanData';
 const FONT_SETTINGS_KEY = 'educationalPlanFontSettings';
 const PRINT_SETTINGS_KEY = 'educationalPlanPrintSettings';
@@ -116,7 +118,7 @@ const App: React.FC = () => {
 
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number>(0);
   const [editingItem, setEditingItem] = useState<PlanItem | null>(null);
-  const [viewMode, setViewMode] = useState<View>('table');
+  const [viewMode, setViewMode] = useState<View | 'dashboard'>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [isPrintSettingsModalOpen, setIsPrintSettingsModalOpen] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
@@ -314,31 +316,11 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch(viewMode) {
       case 'table':
-        return (
-          <PlanTable
-            data={filteredData}
-            selectedMonthIndex={selectedMonthIndex}
-            onEdit={handleEditItem}
-            printSettings={printSettings}
-            isPrinting={isPrinting}
-            onPrintComplete={() => setIsPrinting(false)}
-          />
-        );
+        return <PlanTable data={filteredData} selectedMonthIndex={selectedMonthIndex} onEdit={handleEditItem} printSettings={printSettings} isPrinting={isPrinting} onPrintComplete={() => setIsPrinting(false)} />;
       case 'report':
-        return (
-           <ReportView 
-            data={filteredData}
-            selectedMonthIndex={selectedMonthIndex}
-            onWeeklyExecutionChange={handleWeeklyExecutionChange}
-          />
-        );
+        return <ReportView data={filteredData} selectedMonthIndex={selectedMonthIndex} onWeeklyExecutionChange={handleWeeklyExecutionChange} />;
       case 'semester':
-        return (
-          <SemesterReportView
-            data={filteredData}
-            selectedMonthIndex={selectedMonthIndex}
-          />
-        );
+        return <SemesterReportView data={filteredData} selectedMonthIndex={selectedMonthIndex} />;
       case 'summary':
         return <SummaryView planData={planData} supervisorsPlans={supervisorsPlans} />;
       case 'statistics':
@@ -357,6 +339,8 @@ const App: React.FC = () => {
         return <FrameworkView />;
       case 'supervisors':
         return <SupervisorsView plans={supervisorsPlans} onUpdatePlans={handleUpdateSupervisorsPlans} />;
+      case 'control-panel':
+        return <ControlPanelView />;
       default:
         return null;
     }
@@ -369,83 +353,81 @@ const App: React.FC = () => {
         <div className="container mx-auto px-4 py-4 space-y-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <h1 className="text-xl lg:text-2xl font-bold text-gray-700 text-center md:text-right">
-              خطة قسم الإشراف التربوي للعام الدراسي ٢٠٢٥م-٢٠٢٦م / ١٤٤٧هـ
+              {viewMode === 'dashboard' ? 'لوحة التحكم الرئيسية' : 'خطة قسم الإشراف التربوي للعام الدراسي ٢٠٢٥م-٢٠٢٦م / ١٤٤٧هـ'}
             </h1>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <MonthSelector
-                selectedIndex={selectedMonthIndex}
-                onSelectMonth={handleSelectMonth}
-              />
-              <ViewSwitcher
-                currentView={viewMode}
-                onViewChange={handleViewChange}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-             <div className="w-full lg:w-1/2">
-                <SearchBar query={searchQuery} onQueryChange={handleSearchChange} />
-             </div>
-             <div className="flex items-center gap-2 flex-wrap">
-                 <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
-                    <button
-                        onClick={handleManualSave}
-                        className={`flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm transition-all duration-300 ${saveStatus === 'saved' ? 'bg-green-500 text-white' : 'hover:bg-gray-200'}`}
-                        title="حفظ التغييرات"
-                        disabled={saveStatus !== 'idle'}
-                    >
-                        {saveStatus === 'idle' && <><SaveDataIcon /><span>حفظ</span></>}
-                        {saveStatus === 'saving' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
-                        {saveStatus === 'saved' && <><CheckIcon /><span>تم الحفظ</span></>}
+             {viewMode !== 'dashboard' && (
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <button onClick={() => setViewMode('dashboard')} className="flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary font-semibold rounded-md hover:bg-primary/20" title="العودة للوحة التحكم">
+                        <HomeIcon />
+                        <span>الرئيسية</span>
                     </button>
-                    <button
-                        onClick={handleSyncData}
-                        className={`flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm transition-all duration-300 ${syncStatus === 'synced' ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'}`}
-                        title="مزامنة البيانات من التخزين المحلي (مفيد عند فتح التطبيق في أكثر من نافذة)"
-                        disabled={syncStatus !== 'idle'}
-                    >
-                        {syncStatus === 'idle' && <><SyncIcon /><span>مزامنة</span></>}
-                        {syncStatus === 'syncing' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
-                        {syncStatus === 'synced' && <><CheckIcon /><span>تمت المزامنة</span></>}
-                    </button>
-                    <button
-                        onClick={handleRefreshData}
-                        className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-red-600 hover:text-red-700"
-                        title="تحديث البيانات للخطة الأصلية"
-                    >
-                        <RefreshIcon />
-                        <span>تحديث</span>
-                    </button>
+                    <MonthSelector
+                        selectedIndex={selectedMonthIndex}
+                        onSelectMonth={handleSelectMonth}
+                    />
                 </div>
-                {viewMode === 'table' && (
-                  <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
-                    <button onClick={() => setIsPrinting(true)} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm" title="طباعة الجدول">
-                      <PrintIcon />
-                      <span>طباعة</span>
-                    </button>
-                    <button onClick={() => setIsPrintSettingsModalOpen(true)} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm" title="إعدادات الطباعة">
-                      <CogIcon />
-                    </button>
-                  </div>
-                )}
-                <FontControls 
-                    onFontSizeChange={handleFontSizeChange}
-                    onFontFamilyChange={handleFontFamilyChange}
-                    currentFont={fontSettings.fontFamily}
-                    fontFamilies={fontFamilies}
-                />
-                <ThemeSwitcher
-                    currentThemeId={themeId}
-                    onThemeChange={handleThemeChange}
-                />
-             </div>
+            )}
           </div>
+          {viewMode !== 'dashboard' && (
+             <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div className="w-full lg:w-1/2">
+                    <SearchBar query={searchQuery} onQueryChange={handleSearchChange} />
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                    <ViewSwitcher
+                        currentView={viewMode as View}
+                        onViewChange={handleViewChange}
+                    />
+                    <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+                        <button onClick={handleManualSave} className={`flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm transition-all duration-300 ${saveStatus === 'saved' ? 'bg-green-500 text-white' : 'hover:bg-gray-200'}`} title="حفظ التغييرات" disabled={saveStatus !== 'idle'}>
+                            {saveStatus === 'idle' && <><SaveDataIcon /><span>حفظ</span></>}
+                            {saveStatus === 'saving' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
+                            {saveStatus === 'saved' && <><CheckIcon /><span>تم الحفظ</span></>}
+                        </button>
+                        <button onClick={handleSyncData} className={`flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm transition-all duration-300 ${syncStatus === 'synced' ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'}`} title="مزامنة البيانات من التخزين المحلي (مفيد عند فتح التطبيق في أكثر من نافذة)" disabled={syncStatus !== 'idle'}>
+                            {syncStatus === 'idle' && <><SyncIcon /><span>مزامنة</span></>}
+                            {syncStatus === 'syncing' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
+                            {syncStatus === 'synced' && <><CheckIcon /><span>تمت المزامنة</span></>}
+                        </button>
+                        <button onClick={handleRefreshData} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-red-600 hover:text-red-700" title="تحديث البيانات للخطة الأصلية">
+                            <RefreshIcon />
+                            <span>تحديث</span>
+                        </button>
+                    </div>
+                    {viewMode === 'table' && (
+                    <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+                        <button onClick={() => setIsPrinting(true)} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm" title="طباعة الجدول">
+                        <PrintIcon />
+                        <span>طباعة</span>
+                        </button>
+                        <button onClick={() => setIsPrintSettingsModalOpen(true)} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm" title="إعدادات الطباعة">
+                        <CogIcon />
+                        </button>
+                    </div>
+                    )}
+                    <FontControls 
+                        onFontSizeChange={handleFontSizeChange}
+                        onFontFamilyChange={handleFontFamilyChange}
+                        currentFont={fontSettings.fontFamily}
+                        fontFamilies={fontFamilies}
+                    />
+                    <ThemeSwitcher
+                        currentThemeId={themeId}
+                        onThemeChange={handleThemeChange}
+                    />
+                </div>
+            </div>
+          )}
         </div>
       </header>
       
       <main className="container mx-auto p-4 pb-16">
         <Suspense fallback={<LoadingSpinner />}>
-          {renderContent()}
+            {viewMode === 'dashboard' ? (
+                <Dashboard onViewChange={handleViewChange} />
+            ) : (
+                renderContent()
+            )}
         </Suspense>
       </main>
 
