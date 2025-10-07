@@ -1,6 +1,10 @@
 import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense, useRef } from 'react';
 import { PlanItem, PrintSettings } from './types';
 import { initialPlanData } from './data';
+import { englishSupervisorPlan } from './englishSupervisorPlan';
+import { literarySupervisorPlan } from './literarySupervisorPlan';
+import { scienceSupervisorPlan } from './scienceSupervisorPlan';
+import { budsSupervisorPlan } from './budsSupervisorPlan';
 import MonthSelector from './components/MonthSelector';
 import ViewSwitcher from './components/ViewSwitcher';
 import SearchBar from './components/SearchBar';
@@ -8,8 +12,9 @@ import FontControls from './components/FontControls';
 import Footer from './components/Footer';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { themes } from './themes';
-import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon, GraduationCapIcon, UploadIcon, TrashIcon } from './components/Icons';
+import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon, GraduationCapIcon, UploadIcon, TrashIcon, ImportIcon } from './components/Icons';
 import LoadingSpinner from './components/LoadingSpinner';
+import { MONTHS } from './constants';
 
 // Lazy-loaded components
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -32,6 +37,8 @@ const PrintSettingsModal = lazy(() => import('./components/PrintSettingsModal'))
 
 export type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors' | 'control-panel';
 const LOCAL_STORAGE_KEY = 'educationalPlanData';
+const INITIAL_PLAN_DATA_KEY = 'educationalPlanInitialData';
+const ARCHIVED_PLAN_KEY = 'educationalPlanArchivedData';
 const LOGO_STORAGE_KEY = 'educationalPlanLogo';
 const FONT_SETTINGS_KEY = 'educationalPlanFontSettings';
 const PRINT_SETTINGS_KEY = 'educationalPlanPrintSettings';
@@ -59,7 +66,29 @@ const defaultPrintSettings: PrintSettings = {
     },
 };
 
+// Declare XLSX to avoid TypeScript errors for the global variable from CDN
+declare const XLSX: any;
+
 const App: React.FC = () => {
+    const defaultSupervisorPlans = useMemo(() => ({ 
+        'خطة مشرف اللغة الإنجليزية': englishSupervisorPlan,
+        'خطة مشرف المواد الأدبية': literarySupervisorPlan,
+        'خطة مشرف المواد العلمية والاجتماعيات': scienceSupervisorPlan,
+        'خطة مشرف البراعم': budsSupervisorPlan,
+    }), []);
+
+    const [initialPlan, setInitialPlan] = useState<PlanItem[]>(() => {
+        try {
+          const savedInitialData = localStorage.getItem(INITIAL_PLAN_DATA_KEY);
+          if (savedInitialData) {
+            return JSON.parse(savedInitialData);
+          }
+        } catch (error) {
+          console.error("Failed to parse initial plan data from localStorage", error);
+        }
+        return initialPlanData;
+      });
+
   const [planData, setPlanData] = useState<PlanItem[]>(() => {
     try {
       const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -69,7 +98,7 @@ const App: React.FC = () => {
     } catch (error) {
       console.error("Failed to parse plan data from localStorage", error);
     }
-    return initialPlanData;
+    return initialPlan;
   });
 
   const [fontSettings, setFontSettings] = useState(() => {
@@ -109,12 +138,13 @@ const App: React.FC = () => {
       try {
           const savedData = localStorage.getItem(SUPERVISORS_PLANS_KEY);
           if (savedData) {
-              return JSON.parse(savedData);
+              const parsedData = JSON.parse(savedData);
+              return { ...defaultSupervisorPlans, ...parsedData };
           }
       } catch (error) {
           console.error("Failed to parse supervisors' plans data from localStorage", error);
       }
-      return {};
+      return defaultSupervisorPlans;
   });
 
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number>(0);
@@ -127,6 +157,7 @@ const App: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced'>('idle');
   const [logoSrc, setLogoSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const planFileInputRef = useRef<HTMLInputElement>(null);
 
 
   useEffect(() => {
@@ -191,11 +222,10 @@ const App: React.FC = () => {
   
   const handleRefreshData = useCallback(() => {
     if (window.confirm("هل أنت متأكد من رغبتك في تحديث البيانات؟ سيتم فقدان جميع التغييرات والعودة إلى الخطة الأصلية.")) {
-      setPlanData(initialPlanData);
-      setSupervisorsPlans({});
-      // This will trigger the useEffects to save the initial state back to localStorage
+      setPlanData(initialPlan);
+      setSupervisorsPlans(defaultSupervisorPlans);
     }
-  }, []);
+  }, [initialPlan, defaultSupervisorPlans]);
 
   const handleManualSave = useCallback(() => {
     setSaveStatus('saving');
@@ -210,24 +240,29 @@ const App: React.FC = () => {
         setSaveStatus('saved');
         setTimeout(() => {
           setSaveStatus('idle');
-        }, 1500); // Revert to idle after 1.5 seconds
-      }, 500); // Show saving for 0.5 seconds
+        }, 1500);
+      }, 500);
     } catch (error) {
       console.error("Failed to manually save data to localStorage", error);
-      setSaveStatus('idle'); // Revert on error
+      setSaveStatus('idle');
     }
   }, [planData, fontSettings, printSettings, themeId, supervisorsPlans]);
   
   const handleSyncData = useCallback(() => {
     setSyncStatus('syncing');
     try {
+      // Initial Plan
+      const savedInitialPlan = localStorage.getItem(INITIAL_PLAN_DATA_KEY);
+      if (savedInitialPlan) setInitialPlan(JSON.parse(savedInitialPlan));
+        
       // Plan Data
       const savedPlanData = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedPlanData) setPlanData(JSON.parse(savedPlanData));
 
       // Supervisors Plans
       const savedSupervisorsPlans = localStorage.getItem(SUPERVISORS_PLANS_KEY);
-      if (savedSupervisorsPlans) setSupervisorsPlans(JSON.parse(savedSupervisorsPlans));
+      const parsedSupervisorsPlans = savedSupervisorsPlans ? JSON.parse(savedSupervisorsPlans) : {};
+      setSupervisorsPlans({ ...defaultSupervisorPlans, ...parsedSupervisorsPlans });
 
       // Font Settings
       const savedFontSettings = localStorage.getItem(FONT_SETTINGS_KEY);
@@ -253,7 +288,63 @@ const App: React.FC = () => {
       console.error("Failed to sync data from localStorage", error);
       setSyncStatus('idle');
     }
-  }, []);
+  }, [defaultSupervisorPlans]);
+
+  const handlePlanImport = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!window.confirm("سيتم استبدال الخطة الحالية بالخطة الجديدة. سيتم أرشفة بياناتك الحالية (سيتم الكتابة فوق أي أرشيف سابق). هل تريد المتابعة؟")) {
+      if (planFileInputRef.current) planFileInputRef.current.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            localStorage.setItem(ARCHIVED_PLAN_KEY, JSON.stringify(planData));
+            alert("تم أرشفة الخطة الحالية بنجاح.");
+            
+            const data = new Uint8Array(e.target?.result as ArrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            const newPlanItems: PlanItem[] = jsonData.map((row: any, index: number) => {
+                 const schedule = MONTHS.map(month => {
+                    const val = row[month];
+                    return (val !== undefined && val !== null && val !== '') ? Number(val) : null;
+                });
+                return {
+                    id: row['id'] || Date.now() + index,
+                    domain: row['المجال'] || 'غير محدد',
+                    objective: row['الهدف'] || row['الأهداف'] || 'غير محدد',
+                    indicator: row['المؤشر'] || row['المؤشرات'] || 'غير محدد',
+                    evidence: row['الشاهد'] || row['الشواهد والأدلة'] || 'غير محدد',
+                    activity: row['النشاط'] || row['الأنشطة'] || 'غير محدد',
+                    planned: row['المخطط'] || schedule.reduce((sum, val) => sum + (val || 0), 0),
+                    schedule,
+                    executed: row['المنفذ'] || 0,
+                    indicatorCount: row['عدد المؤشرات'] || null,
+                    weeklyExecution: [null, null, null, null],
+                };
+            });
+            
+            setInitialPlan(newPlanItems);
+            setPlanData(newPlanItems);
+            localStorage.setItem(INITIAL_PLAN_DATA_KEY, JSON.stringify(newPlanItems));
+            alert("تم استيراد الخطة الجديدة بنجاح!");
+
+        } catch (err) {
+            console.error("Error parsing plan file:", err);
+            alert('فشل في تحليل ملف الخطة. يرجى التأكد من أن الملف يحتوي على الأعمدة المطلوبة.');
+        } finally {
+            if (planFileInputRef.current) planFileInputRef.current.value = '';
+        }
+    };
+    reader.readAsArrayBuffer(file);
+  }, [planData]);
 
   const handleLogoChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -346,6 +437,14 @@ const App: React.FC = () => {
   const handleUpdateSupervisorsPlans = useCallback((newPlans: {[key: string]: PlanItem[]}) => {
     setSupervisorsPlans(newPlans);
   }, []);
+  
+  const handleUpdateSupervisorPlan = useCallback((supervisorName: string, updatedPlan: PlanItem[]) => {
+    setSupervisorsPlans(prevPlans => ({
+      ...prevPlans,
+      [supervisorName]: updatedPlan
+    }));
+  }, []);
+
 
   const filteredData = useMemo(() => {
     if (!searchQuery) {
@@ -385,7 +484,12 @@ const App: React.FC = () => {
       case 'framework':
         return <FrameworkView />;
       case 'supervisors':
-        return <SupervisorsView plans={supervisorsPlans} onUpdatePlans={handleUpdateSupervisorsPlans} />;
+        return <SupervisorsView 
+                    plans={supervisorsPlans} 
+                    onUpdatePlans={handleUpdateSupervisorsPlans}
+                    selectedMonthIndex={selectedMonthIndex}
+                    onUpdateSupervisorPlan={handleUpdateSupervisorPlan}
+                />;
       case 'control-panel':
         return <ControlPanelView />;
       default:
@@ -470,6 +574,17 @@ const App: React.FC = () => {
                             {syncStatus === 'idle' && <><SyncIcon /><span>مزامنة</span></>}
                             {syncStatus === 'syncing' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
                             {syncStatus === 'synced' && <><CheckIcon /><span>تمت المزامنة</span></>}
+                        </button>
+                        <input
+                            type="file"
+                            ref={planFileInputRef}
+                            onChange={handlePlanImport}
+                            className="hidden"
+                            accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        />
+                        <button onClick={() => planFileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-green-600 hover:text-green-700" title="استيراد خطة جديدة من ملف Excel">
+                            <ImportIcon />
+                            <span>استيراد</span>
                         </button>
                         <button onClick={handleRefreshData} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-red-600 hover:text-red-700" title="تحديث البيانات للخطة الأصلية">
                             <RefreshIcon />

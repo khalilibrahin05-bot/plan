@@ -1,0 +1,205 @@
+import { PlanItem } from './types';
+
+export const budsSupervisorPlan: PlanItem[] = [
+    // Page 1: Internal Operations
+    {
+        id: 401,
+        domain: "العمليات الداخلية",
+        objective: "تنفيذ خطط الإشراف التربوي",
+        indicator: "تم تنفيذ 8 أنشطة للخطط والخلاصات",
+        evidence: "الخطة لتنفيذ",
+        activity: "المراجعة الدورية لانشطة الخطة",
+        planned: 7,
+        schedule: [1, 1, 1, 1, 1, 1, 1, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 8,
+        weeklyExecution: [null, null, null, null]
+    },
+    // Page 2: Teaching
+    {
+        id: 402,
+        domain: "التدريس",
+        objective: "التخطيط التربوي للمنهج الدراسي",
+        indicator: "تم تدريب المعلمين إعداد الخطط الفصلية لعدد 1 بنسبة 100%",
+        evidence: "تقرير النشاط",
+        activity: "دورة تدريبية في إعداد الخطط الفصلية",
+        planned: 1,
+        schedule: [1, null, null, null, null, null, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 1,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 403,
+        domain: "التدريس",
+        objective: "التخطيط التربوي للمنهج الدراسي",
+        indicator: "تم تقديم تغذية راجعة للخطط التدريسية للمواد الدراسية لعدد ٢ بنسبة 100%",
+        evidence: "نسخ الخطط",
+        activity: "ورش مراجعة الخطط",
+        planned: 2,
+        schedule: [1, 1, null, null, null, null, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 2,
+        weeklyExecution: [null, null, null, null]
+    },
+    // Page 3: Specific Programs
+    {
+        id: 404,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة 3 برامج نوعية للبراعم",
+        evidence: "لقاءات الترتيب للبرنامج",
+        activity: "برنامج نجم القراءة",
+        planned: 1,
+        schedule: [null, null, 1, null, null, null, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 3,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 405,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة 3 برامج نوعية للبراعم",
+        evidence: "لقاءات المتابعة",
+        activity: "متابعة تنفيذ البرنامج",
+        planned: 3,
+        schedule: [null, null, 1, 1, 1, null, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 3,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 406,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة 3 برامج نوعية للبراعم",
+        evidence: "نسخة التصور",
+        activity: "رفع تصور فعالية البرنامج مع نجم الكتابة",
+        planned: 1,
+        schedule: [null, null, null, null, 1, null, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 3,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 407,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة 3 برامج نوعية للبراعم",
+        evidence: "لقاءات الترتيب للبرنامج",
+        activity: "برنامج نجم الكتابة",
+        planned: 2,
+        schedule: [null, null, null, 1, 1, null, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 3,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 408,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة 3 برامج نوعية للبراعم",
+        evidence: "لقاءات المتابعة",
+        activity: "متابعة تنفيذ البرنامج",
+        planned: 6,
+        schedule: [1, 1, 1, 1, 1, 1, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 3,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 409,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
+        evidence: "تصورات البرنامج",
+        activity: "برنامج الحساب الذهني",
+        planned: 2,
+        schedule: [null, null, null, null, 1, 1, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 2,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 410,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
+        evidence: "سجلات المتابعة",
+        activity: "متابعة تنفيذ البرنامج",
+        planned: 3,
+        schedule: [null, null, null, 1, 1, 1, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 2,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 411,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
+        evidence: "تصورات البرنامج",
+        activity: "برنامج عبقري الرياضيات",
+        planned: 3,
+        schedule: [1, 1, 1, null, null, null, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 2,
+        weeklyExecution: [null, null, null, null]
+    },
+    {
+        id: 412,
+        domain: "البرامج النوعية",
+        objective: "تنفيذ البرامج النوعية وقياس أثرها",
+        indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
+        evidence: "تصورات البرنامج",
+        activity: "برنامج نجم القراء باللغة الانجليزية",
+        planned: 3,
+        schedule: [null, null, null, 1, 1, 1, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 2,
+        weeklyExecution: [null, null, null, null]
+    },
+    // Page 4: Professional Development
+    {
+        id: 413,
+        domain: "التنمية المهنية",
+        objective: "تحديد برامج التنمية المهنية للكادر التربوي",
+        indicator: "قياس أثر التدريب في الفئة المستفيدة",
+        evidence: "تقرير قياس أثر التدريب",
+        activity: "ورشة قياس الأثر أثناء الزيارات",
+        planned: 5,
+        schedule: [null, null, 2, 3, null, null, null, null, null, null, null, null],
+        executed: null,
+        indicatorCount: 5,
+        weeklyExecution: [null, null, null, null]
+    },
+    // Page 5: Learning Resources
+    {
+        id: 414,
+        domain: "وسائل ومصادر التعلم",
+        objective: "تفعيل الاستخدام الأمثل لوسائل ومصادر التعلم",
+        indicator: "تم تنفيذ عدد ٢ نشاط لتوعية المعلمين",
+        evidence: "المنشورات",
+        activity: "منشور/مجموعات وتس/دورة ونلاين",
+        planned: 8,
+        schedule: [1, 1, 1, 1, 1, 1, 1, 1, null, null, null, null],
+        executed: null,
+        indicatorCount: 2,
+        weeklyExecution: [null, null, null, null]
+    },
+    // Page 6: Educational Achievement Assessment
+    {
+        id: 415,
+        domain: "تقويم التحصيل العلمي",
+        objective: "إعداد الاختبارات طبقا لجداول المواصفات",
+        indicator: "أعد المعلمون عدد 4 اختبارات",
+        evidence: "نماذج من المراجعة",
+        activity: "ورشة تدريبية",
+        planned: 2,
+        schedule: [null, 1, null, null, null, null, null, null, null, null, null, 1],
+        executed: null,
+        indicatorCount: 4,
+        weeklyExecution: [null, null, null, null]
+    },
+];

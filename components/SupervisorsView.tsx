@@ -1,8 +1,12 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, lazy, Suspense } from 'react';
 import { PlanItem } from '../types';
 import { MONTHS } from '../constants';
-import { getDomainColor } from '../colors';
-import { PrintIcon, TrashIcon, UserGroupIcon } from './Icons';
+import { PrintIcon, TrashIcon, UserGroupIcon, TableIcon, DocumentReportIcon } from './Icons';
+import SupervisorPlanTable from './SupervisorPlanTable';
+import SupervisorReportView from './SupervisorReportView';
+import LoadingSpinner from './LoadingSpinner';
+
+const EditModal = lazy(() => import('./EditModal'));
 
 // XLSX type declaration
 declare const XLSX: any;
@@ -16,6 +20,8 @@ const parseSupervisorPlan = (data: any[]): PlanItem[] => {
     });
 
     const planned = schedule.reduce((sum, val) => sum + (val || 0), 0);
+    const executed = row['المنفذ'] || 0; // Keep existing executed if available
+    const weeklyExecution = row['المنفذ'] ? [executed, null, null, null] : [null, null, null, null]; // Simple distribution for existing data
 
     return {
       id: row['id'] || Date.now() + index,
@@ -26,74 +32,27 @@ const parseSupervisorPlan = (data: any[]): PlanItem[] => {
       activity: row['النشاط'] || 'غير محدد',
       planned: planned,
       schedule: schedule,
-      executed: row['المنفذ'] || 0,
+      executed: executed,
       indicatorCount: row['عدد المؤشرات'] || null,
-      weeklyExecution: [null, null, null, null], // Default value, not from supervisor plan
+      weeklyExecution: weeklyExecution,
     };
   });
-};
-
-// Component to display a single supervisor's plan
-const SupervisorPlanTable: React.FC<{ supervisorName: string; plan: PlanItem[] }> = ({ supervisorName, plan }) => {
-  const groupedData = plan.reduce((acc, item) => {
-    (acc[item.domain] = acc[item.domain] || []).push(item);
-    return acc;
-  }, {} as Record<string, PlanItem[]>);
-
-  return (
-    <div className="bg-white shadow-lg rounded-lg overflow-x-auto">
-      <h3 className="text-xl font-bold p-4 bg-gray-100">{`خطة المشرف: ${supervisorName}`}</h3>
-      <table className="w-full min-w-[1600px] text-sm text-right text-gray-600">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-200">
-          <tr>
-            <th scope="col" className="px-2 py-2 min-w-[180px]">المجال</th>
-            <th scope="col" className="px-2 py-2 min-w-[250px]">الأهداف</th>
-            <th scope="col" className="px-2 py-2 min-w-[250px]">الأنشطة</th>
-            {MONTHS.map((month) => (
-              <th key={month} scope="col" className="px-1 py-2 text-center">{month}</th>
-            ))}
-            <th scope="col" className="px-1 py-2">المخطط</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(groupedData).map((domain) => (
-            <React.Fragment key={domain}>
-              {groupedData[domain].map((item, itemIndex) => {
-                const colors = getDomainColor(domain);
-                return (
-                  <tr key={item.id} className={`border-b ${colors.bg}`}>
-                    {itemIndex === 0 && (
-                      <td rowSpan={groupedData[domain].length} className={`px-2 py-2 font-semibold align-top border-l ${colors.text} ${colors.border}`}>
-                        {domain}
-                      </td>
-                    )}
-                    <td className="px-2 py-2">{item.objective}</td>
-                    <td className="px-2 py-2 font-medium">{item.activity}</td>
-                    {item.schedule.map((value, index) => (
-                      <td key={index} className="px-1 py-2 text-center font-mono">{value || ''}</td>
-                    ))}
-                    <td className="px-1 py-2 text-center font-bold">{item.planned || '-'}</td>
-                  </tr>
-                );
-              })}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
 };
 
 // Main view component
 interface SupervisorsViewProps {
   plans: { [key: string]: PlanItem[] };
   onUpdatePlans: (newPlans: { [key: string]: PlanItem[] }) => void;
+  selectedMonthIndex: number;
+  onUpdateSupervisorPlan: (supervisorName: string, updatedPlan: PlanItem[]) => void;
 }
 
-const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans }) => {
-  const [selectedSupervisor, setSelectedSupervisor] = useState<string | null>(null);
+const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans, selectedMonthIndex, onUpdateSupervisorPlan }) => {
+  const [selectedSupervisor, setSelectedSupervisor] = useState<string | null>(Object.keys(plans)[0] || null);
+  const [editingItem, setEditingItem] = useState<PlanItem | null>(null);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [localView, setLocalView] = useState<'table' | 'report'>('table');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,7 +73,6 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
 
         const parsedPlan = parseSupervisorPlan(jsonData);
         
-        // Use filename without extension as supervisor name
         const supervisorName = file.name.replace(/\.[^/.]+$/, "");
 
         const newPlans = { ...plans, [supervisorName]: parsedPlan };
@@ -126,7 +84,6 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
         setError('فشل في تحليل ملف Excel. يرجى التأكد من أن الملف بالتنسيق الصحيح.');
       } finally {
         setIsLoading(false);
-        // Reset file input to allow re-uploading the same file
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -139,18 +96,91 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
     reader.readAsArrayBuffer(file);
   };
 
-  const handleSelectSupervisor = (name: string) => {
-    setSelectedSupervisor(name);
-  };
-
   const handleDeleteSupervisor = (name: string) => {
-    const newPlans = { ...plans };
-    delete newPlans[name];
-    onUpdatePlans(newPlans);
-    if (selectedSupervisor === name) {
-      setSelectedSupervisor(null);
+    if (window.confirm(`هل أنت متأكد من حذف خطة المشرف: ${name}؟`)) {
+        const newPlans = { ...plans };
+        delete newPlans[name];
+        onUpdatePlans(newPlans);
+        if (selectedSupervisor === name) {
+          const remainingSupervisors = Object.keys(newPlans);
+          setSelectedSupervisor(remainingSupervisors.length > 0 ? remainingSupervisors[0] : null);
+        }
     }
   };
+  
+  const handleAddItem = useCallback(() => {
+    if (!selectedSupervisor) return;
+    const currentPlan = plans[selectedSupervisor];
+    const defaultDomain = currentPlan.length > 0 ? currentPlan[0].domain : 'غير محدد';
+    const newItem: PlanItem = {
+      id: Date.now(),
+      domain: defaultDomain,
+      objective: '',
+      indicator: '',
+      evidence: '',
+      activity: '',
+      planned: 0,
+      schedule: Array(12).fill(null),
+      executed: 0,
+      indicatorCount: null,
+      weeklyExecution: [null, null, null, null],
+    };
+    setEditingItem(newItem);
+  }, [selectedSupervisor, plans]);
+
+  const handleEditItem = useCallback((item: PlanItem) => {
+    setEditingItem(item);
+  }, []);
+
+  const handleDeleteItem = useCallback((itemId: number) => {
+    if (!selectedSupervisor) return;
+    if (window.confirm('هل أنت متأكد من حذف هذا النشاط؟')) {
+      const newPlans = { ...plans };
+      const currentPlan = newPlans[selectedSupervisor];
+      newPlans[selectedSupervisor] = currentPlan.filter(item => item.id !== itemId);
+      onUpdatePlans(newPlans);
+    }
+  }, [selectedSupervisor, plans, onUpdatePlans]);
+
+  const handleCloseModal = useCallback(() => {
+    setEditingItem(null);
+  }, []);
+
+  const handleSaveItem = useCallback((updatedItem: PlanItem) => {
+    if (!selectedSupervisor) return;
+
+    const newPlans = { ...plans };
+    const currentPlan = newPlans[selectedSupervisor];
+    const itemExists = currentPlan.some(item => item.id === updatedItem.id);
+
+    if (itemExists) {
+      newPlans[selectedSupervisor] = currentPlan.map(item =>
+        item.id === updatedItem.id ? updatedItem : item
+      );
+    } else {
+      newPlans[selectedSupervisor] = [...currentPlan, updatedItem];
+    }
+    
+    // Recalculate planned total from schedule
+    newPlans[selectedSupervisor] = newPlans[selectedSupervisor].map(item => ({
+        ...item,
+        planned: item.schedule.reduce((sum, val) => sum + (val || 0), 0)
+    }));
+
+    onUpdatePlans(newPlans);
+    setEditingItem(null);
+  }, [selectedSupervisor, plans, onUpdatePlans]);
+
+  const handleWeeklyExecutionChange = useCallback((itemId: number, newWeeklyValues: (number | null)[]) => {
+      if (!selectedSupervisor) return;
+      const updatedPlan = plans[selectedSupervisor].map(item =>
+          item.id === itemId
+              ? { ...item, weeklyExecution: newWeeklyValues, executed: newWeeklyValues.reduce((s, v) => s + (v || 0), 0) }
+              : item
+      );
+      onUpdateSupervisorPlan(selectedSupervisor, updatedPlan);
+  }, [selectedSupervisor, plans, onUpdateSupervisorPlan]);
+
 
   const handlePrint = () => {
     window.print();
@@ -172,7 +202,7 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
                 className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 flex items-center gap-2"
             >
                 <PrintIcon />
-                <span>طباعة خطة المشرف</span>
+                <span>طباعة</span>
             </button>
           )}
         </div>
@@ -181,15 +211,14 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
         </h2>
         
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Sidebar */}
           <aside className="w-full md:w-1/4 no-print">
-            <div className="p-4 bg-gray-50 rounded-lg border">
+            <div className="p-4 bg-gray-50 rounded-lg border sticky top-40">
                 <h3 className="font-bold text-lg mb-3">قائمة المشرفين</h3>
                  <input
                     type="file"
                     ref={fileInputRef}
                     className="hidden"
-                    accept=".xlsx, .xls"
+                    accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     onChange={handleFileImport}
                 />
                 <button
@@ -206,7 +235,7 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
                     {supervisorNames.map(name => (
                        <li key={name} className="flex items-center justify-between group">
                          <button
-                           onClick={() => handleSelectSupervisor(name)}
+                           onClick={() => setSelectedSupervisor(name)}
                            className={`w-full text-right p-2 rounded-md transition-colors ${selectedSupervisor === name ? 'bg-primary text-white font-bold' : 'hover:bg-primary/10'}`}
                          >
                            {name}
@@ -220,11 +249,37 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
             </div>
           </aside>
           
-          {/* Main Content */}
           <main className="flex-1">
             {selectedSupervisor ? (
-              <div className="printable-content">
-                 <SupervisorPlanTable supervisorName={selectedSupervisor} plan={plans[selectedSupervisor]} />
+              <div>
+                <div className="no-print flex items-center justify-center p-1 bg-gray-200 rounded-lg mb-4">
+                  <button onClick={() => setLocalView('table')} className={`w-1/2 flex items-center justify-center gap-2 p-2 rounded-md font-semibold transition-colors ${localView === 'table' ? 'bg-white shadow text-primary' : 'text-gray-600'}`}>
+                    <TableIcon className="h-5 w-5"/>
+                    <span>عرض الخطة</span>
+                  </button>
+                  <button onClick={() => setLocalView('report')} className={`w-1/2 flex items-center justify-center gap-2 p-2 rounded-md font-semibold transition-colors ${localView === 'report' ? 'bg-white shadow text-primary' : 'text-gray-600'}`}>
+                    <DocumentReportIcon className="h-5 w-5" />
+                    <span>التقرير الشهري</span>
+                  </button>
+                </div>
+                <div className="printable-content">
+                  {localView === 'table' ? (
+                     <SupervisorPlanTable
+                        supervisorName={selectedSupervisor}
+                        plan={plans[selectedSupervisor]}
+                        onAdd={handleAddItem}
+                        onEdit={handleEditItem}
+                        onDelete={handleDeleteItem}
+                     />
+                  ) : (
+                     <SupervisorReportView
+                        supervisorName={selectedSupervisor}
+                        plan={plans[selectedSupervisor]}
+                        selectedMonthIndex={selectedMonthIndex}
+                        onWeeklyExecutionChange={handleWeeklyExecutionChange}
+                     />
+                  )}
+                </div>
               </div>
             ) : (
               <div className="flex items-center justify-center h-96 bg-gray-50 rounded-lg border-2 border-dashed">
@@ -237,6 +292,17 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
         </div>
       </div>
 
+      <Suspense fallback={<LoadingSpinner />}>
+        {editingItem && (
+            <EditModal
+                item={editingItem}
+                isOpen={!!editingItem}
+                onClose={handleCloseModal}
+                onSave={handleSaveItem}
+            />
+        )}
+      </Suspense>
+
        <style>{`
         @media print {
             .no-print { display: none !important; }
@@ -246,6 +312,12 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans 
             aside { display: none !important; }
             .flex, .grid {
                 page-break-inside: avoid;
+            }
+             .printing-active .no-print-when-item-printing {
+                display: none !important;
+            }
+            .printing-active .printable-item:not(.is-printing) {
+                display: none !important;
             }
         }
       `}</style>
