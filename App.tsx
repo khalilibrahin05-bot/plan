@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense, useRef } from 'react';
 import { PlanItem, PrintSettings } from './types';
 import { initialPlanData } from './data';
+import { planData1447 } from './data-1447';
 import { englishSupervisorPlan } from './englishSupervisorPlan';
 import { literarySupervisorPlan } from './literarySupervisorPlan';
 import { scienceSupervisorPlan } from './scienceSupervisorPlan';
@@ -12,7 +13,7 @@ import FontControls from './components/FontControls';
 import Footer from './components/Footer';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { themes } from './themes';
-import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon, GraduationCapIcon, UploadIcon, TrashIcon, ImportIcon } from './components/Icons';
+import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon, GraduationCapIcon, UploadIcon, TrashIcon, ImportIcon, UpdatePlanIcon } from './components/Icons';
 import LoadingSpinner from './components/LoadingSpinner';
 import { MONTHS } from './constants';
 
@@ -221,7 +222,7 @@ const App: React.FC = () => {
   }, []);
   
   const handleRefreshData = useCallback(() => {
-    if (window.confirm("هل أنت متأكد من رغبتك في تحديث البيانات؟ سيتم فقدان جميع التغييرات والعودة إلى الخطة الأصلية.")) {
+    if (window.confirm("هل أنت متأكد من رغبتك في إعادة تعيين البيانات؟ سيتم فقدان جميع التغييرات والعودة إلى الخطة الأصلية.")) {
       setPlanData(initialPlan);
       setSupervisorsPlans(defaultSupervisorPlans);
     }
@@ -344,6 +345,48 @@ const App: React.FC = () => {
         }
     };
     reader.readAsArrayBuffer(file);
+  }, [planData]);
+
+  const handleUpdateToNewPlan = useCallback(() => {
+    if (!window.confirm("سيتم تحديث الخطة الرئيسية إلى إصدار 1447هـ. سيتم محاولة الحفاظ على بيانات التنفيذ (المنفذ) للأنشطة المتطابقة. هل تريد المتابعة؟")) {
+        return;
+    }
+
+    const oldPlanData = planData;
+    const newPlanStructure = planData1447;
+
+    const oldDataMap = new Map<string, { executed: number | null; weeklyExecution: (number | null)[] }>();
+    oldPlanData.forEach(item => {
+        const key = item.activity.trim();
+        if (!oldDataMap.has(key)) { // Avoid overwriting if duplicate activities exist, take first one
+            oldDataMap.set(key, { executed: item.executed, weeklyExecution: item.weeklyExecution });
+        }
+    });
+
+    const mergedPlanData = newPlanStructure.map(newItem => {
+        const key = newItem.activity.trim();
+        const oldExecutionData = oldDataMap.get(key);
+
+        if (oldExecutionData) {
+            return {
+                ...newItem,
+                executed: oldExecutionData.executed,
+                weeklyExecution: oldExecutionData.weeklyExecution,
+            };
+        }
+        return newItem; // Return new item with its default empty execution data
+    });
+
+    setPlanData(mergedPlanData);
+    setInitialPlan(mergedPlanData); // Update the base plan for refreshes
+    try {
+      localStorage.setItem(INITIAL_PLAN_DATA_KEY, JSON.stringify(mergedPlanData));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mergedPlanData));
+    } catch (error) {
+      console.error("Failed to save new initial plan data to localStorage", error);
+    }
+
+    alert("تم تحديث الخطة بنجاح!");
   }, [planData]);
 
   const handleLogoChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -582,13 +625,17 @@ const App: React.FC = () => {
                             className="hidden"
                             accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                         />
-                        <button onClick={() => planFileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-green-600 hover:text-green-700" title="استيراد خطة جديدة من ملف Excel">
+                        <button onClick={() => planFileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-green-600 hover:text-green-700" title="استبدال الخطة الحالية بخطة جديدة من ملف Excel">
                             <ImportIcon />
-                            <span>استيراد</span>
+                            <span>استبدال الخطة</span>
                         </button>
-                        <button onClick={handleRefreshData} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-red-600 hover:text-red-700" title="تحديث البيانات للخطة الأصلية">
+                        <button onClick={handleUpdateToNewPlan} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-purple-600 hover:text-purple-700" title="تحديث الخطة إلى إصدار 1447هـ مع الحفاظ على بيانات التنفيذ">
+                            <UpdatePlanIcon />
+                            <span>تحديث الخطة</span>
+                        </button>
+                        <button onClick={handleRefreshData} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-red-600 hover:text-red-700" title="إعادة تعيين الخطة إلى حالتها الأصلية (سيتم فقدان التغييرات)">
                             <RefreshIcon />
-                            <span>تحديث</span>
+                            <span>إعادة تعيين</span>
                         </button>
                     </div>
                     {viewMode === 'table' && (

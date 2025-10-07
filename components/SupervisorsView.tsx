@@ -267,6 +267,7 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans,
                      <SupervisorPlanTable
                         supervisorName={selectedSupervisor}
                         plan={plans[selectedSupervisor]}
+                        selectedMonthIndex={selectedMonthIndex}
                         onAdd={handleAddItem}
                         onEdit={handleEditItem}
                         onDelete={handleDeleteItem}

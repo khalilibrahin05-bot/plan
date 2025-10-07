@@ -1,6 +1,6 @@
 import { PlanItem } from './types';
 
-export const initialPlanData: PlanItem[] = [
+export const planData1447: PlanItem[] = [
     { id: 1, domain: "العمليات الإدارية للإشراف التربوي", objective: "إعداد خطط الإشراف التربوي والأكاديمي", indicator: "تم إعداد 5 خطط للإشراف التربوي / تم إعداد 1 مصفوفة للإشراف الأكاديمي", evidence: "نسخ الخطط / نسخ المصفوفة", activity: "ورشة المراجعة بداية نهاية العام", planned: 4, schedule: [1, null, null, null, null, null, null, 1, null, null, null, 2], executed: 0, indicatorCount: 6, weeklyExecution: [null, null, null, null] },
     { id: 2, domain: "العمليات الإدارية للإشراف التربوي", objective: "إعداد خطط الإشراف التربوي والأكاديمي", indicator: "تم إعداد 5 خطط للإشراف التربوي", evidence: "نسخ الخطط", activity: "ورشة إقرار الخطط", planned: 2, schedule: [2, null, null, null, null, null, null, null, null, null, null, null], executed: 0, indicatorCount: 5, weeklyExecution: [null, null, null, null] },
     { id: 3, domain: "العمليات الإدارية للإشراف التربوي", objective: "إعداد خطط الإشراف التربوي والأكاديمي", indicator: "تم إعداد 5 خطط للإشراف التربوي", evidence: "نسخ الخلاصات", activity: "لقاءات المراجعة بداية العام ونهايته", planned: 6, schedule: [2, null, null, null, null, null, null, 2, null, null, null, 2], executed: 0, indicatorCount: 5, weeklyExecution: [null, null, null, null] },
