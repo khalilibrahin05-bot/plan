@@ -3,7 +3,7 @@ import { PlanItem } from './types';
 export const scienceSupervisorPlan: PlanItem[] = [
     // Page 1: Internal Operations
     {
-        id: 301,
+        id: '301',
         domain: "العمليات الداخلية",
         objective: "تنفيذ خطط الإشراف التربوي",
         indicator: "تم تنفيذ 8 أنشطة للخطط والخلاصات",
@@ -16,7 +16,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 302,
+        id: '302',
         domain: "العمليات الداخلية",
         objective: "تنفيذ خطط الإشراف التربوي",
         indicator: "تم تنفيذ 8 أنشطة للخطط والخلاصات",
@@ -29,7 +29,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 303,
+        id: '303',
         domain: "العمليات الداخلية",
         objective: "تنفيذ خطط الإشراف التربوي",
         indicator: "تم تنفيذ 8 أنشطة للخطط والخلاصات",
@@ -42,7 +42,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 304,
+        id: '304',
         domain: "العمليات الداخلية",
         objective: "تنفيذ خطط الإشراف التربوي",
         indicator: "تم مناقشة ٢ تقارير أداء للخطط بنسبة ١٠٠%",
@@ -55,7 +55,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 305,
+        id: '305',
         domain: "العمليات الداخلية",
         objective: "تنفيذ خطط الإشراف التربوي",
         indicator: "تم مناقشة ٢ تقارير أداء للخطط بنسبة ١٠٠%",
@@ -69,7 +69,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
     },
     // Page 2: Teaching
     {
-        id: 306,
+        id: '306',
         domain: "التدريس",
         objective: "التخطيط التربوي للمنهج الدراسي",
         indicator: "تم تدريب المعلمين إعداد الخطط الفصلية لعدد 1 بنسبة 100%",
@@ -82,7 +82,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 307,
+        id: '307',
         domain: "التدريس",
         objective: "التخطيط التربوي للمنهج الدراسي",
         indicator: "تم تقديم تغذية راجعة للخطط التدريسية للمواد الدراسية لعدد ٢ بنسبة 100%",
@@ -95,7 +95,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 308,
+        id: '308',
         domain: "التدريس",
         objective: "تفعيل استخدام طرائق التعلم النشط في العملية التعليمية",
         indicator: "تم ممارسة ٧٥% من المعلمين لاستراتيجيات التعلم النشط",
@@ -108,7 +108,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 309,
+        id: '309',
         domain: "التدريس",
         objective: "تفعيل استخدام طرائق التعلم النشط في العملية التعليمية",
         indicator: "تم ممارسة ٧٥% من المعلمين لاستراتيجيات التعلم النشط",
@@ -121,7 +121,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 310,
+        id: '310',
         domain: "التدريس",
         objective: "تفعيل استخدام طرائق التعلم النشط في العملية التعليمية",
         indicator: "تم ممارسة ٧٥% من المعلمين لاستراتيجيات التعلم النشط",
@@ -134,7 +134,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 311,
+        id: '311',
         domain: "التدريس",
         objective: "تفعيل استخدام طرائق التعلم النشط في العملية التعليمية",
         indicator: "توظيف المعلمين للمهارات الحياتية",
@@ -147,7 +147,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 312,
+        id: '312',
         domain: "التدريس",
         objective: "تفعيل استخدام طرائق التعلم النشط في العملية التعليمية",
         indicator: "توظيف المعلمين للمهارات الحياتية",
@@ -160,7 +160,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 313,
+        id: '313',
         domain: "التدريس",
         objective: "تفعيل الإثراء الأمثل للمواد الدراسية",
         indicator: "تم تنفذ ٢ من البرامج العلاجية من قبل المعلم",
@@ -173,7 +173,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 314,
+        id: '314',
         domain: "البرامج النوعية",
         objective: "تفعيل الإثراء الأمثل للمواد الدراسية",
         indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
@@ -186,7 +186,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 315,
+        id: '315',
         domain: "البرامج النوعية",
         objective: "تفعيل الإثراء الأمثل للمواد الدراسية",
         indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
@@ -200,7 +200,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
     },
     // Page 3: Professional Development
     {
-        id: 316,
+        id: '316',
         domain: "التنمية المهنية",
         objective: "تحديد برامج التنمية المهنية للكادر التربوي",
         indicator: "قياس أثر التدريب في الفئة المستفيدة",
@@ -213,7 +213,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 317,
+        id: '317',
         domain: "التنمية المهنية",
         objective: "تحديد برامج التنمية المهنية للكادر التربوي",
         indicator: "تم تحديد برامج التنمية المهنية للمعلمين",
@@ -227,7 +227,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
     },
     // Page 4: Learning Resources
     {
-        id: 318,
+        id: '318',
         domain: "وسائل ومصادر التعلم",
         objective: "تفعيل الاستخدام الأمثل لوسائل ومصادر التعلم",
         indicator: "تم تنفيذ عدد ٢ نشاط لتوعية المعلمين",
@@ -240,7 +240,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 319,
+        id: '319',
         domain: "وسائل ومصادر التعلم",
         objective: "تفعيل الاستخدام الأمثل لوسائل ومصادر التعلم",
         indicator: "استخدم المعلمون عدد 1 وسيلة لكل حصة",
@@ -254,7 +254,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
     },
     // Page 5: Educational Achievement Assessment
     {
-        id: 320,
+        id: '320',
         domain: "تقويم التحصيل العلمي",
         objective: "إعداد الاختبارات طبقا لجداول المواصفات",
         indicator: "أعد المعلمون عدد 4 اختبارات",
@@ -267,7 +267,7 @@ export const scienceSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 321,
+        id: '321',
         domain: "تقويم التحصيل العلمي",
         objective: "إعداد الاختبارات طبقا لجداول المواصفات",
         indicator: "أعد المعلمون عدد 4 اختبارات",

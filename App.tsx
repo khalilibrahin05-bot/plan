@@ -311,13 +311,13 @@ const App: React.FC = () => {
             const worksheet = workbook.Sheets[sheetName];
             const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-            const newPlanItems: PlanItem[] = jsonData.map((row: any, index: number) => {
+            const newPlanItems: PlanItem[] = jsonData.map((row: any) => {
                  const schedule = MONTHS.map(month => {
                     const val = row[month];
                     return (val !== undefined && val !== null && val !== '') ? Number(val) : null;
                 });
                 return {
-                    id: row['id'] || Date.now() + index,
+                    id: String(row['id'] || crypto.randomUUID()),
                     domain: row['المجال'] || 'غير محدد',
                     objective: row['الهدف'] || row['الأهداف'] || 'غير محدد',
                     indicator: row['المؤشر'] || row['المؤشرات'] || 'غير محدد',
@@ -411,7 +411,7 @@ const App: React.FC = () => {
     setEditingItem(null);
   }, []);
   
-  const handleWeeklyExecutionChange = useCallback((itemId: number, newWeeklyValues: (number | null)[]) => {
+  const handleWeeklyExecutionChange = useCallback((itemId: string, newWeeklyValues: (number | null)[]) => {
     setPlanData(prevData =>
       prevData.map(item =>
         item.id === itemId

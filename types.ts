@@ -1,6 +1,6 @@
 
 export interface PlanItem {
-  id: number;
+  id: string;
   domain: string;
   objective: string;
   indicator: string;

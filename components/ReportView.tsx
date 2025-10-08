@@ -14,9 +14,9 @@ interface ReportItemCardProps {
   item: PlanItem;
   selectedMonthIndex: number;
   monthName: string;
-  printingItemId: number | null;
-  onWeeklyExecutionChange: (itemId: number, newWeeklyValues: (number | null)[]) => void;
-  onPrintSingleItem: (itemId: number) => void;
+  printingItemId: string | null;
+  onWeeklyExecutionChange: (itemId: string, newWeeklyValues: (number | null)[]) => void;
+  onPrintSingleItem: (itemId: string) => void;
 }
 
 const ReportItemCard = React.memo<ReportItemCardProps>(({
@@ -57,11 +57,11 @@ const ReportItemCard = React.memo<ReportItemCardProps>(({
 interface ReportViewProps {
   data: PlanItem[];
   selectedMonthIndex: number;
-  onWeeklyExecutionChange: (itemId: number, newWeeklyValues: (number | null)[]) => void;
+  onWeeklyExecutionChange: (itemId: string, newWeeklyValues: (number | null)[]) => void;
 }
 
 const ReportView: React.FC<ReportViewProps> = ({ data, selectedMonthIndex, onWeeklyExecutionChange }) => {
-  const [printingItemId, setPrintingItemId] = useState<number | null>(null);
+  const [printingItemId, setPrintingItemId] = useState<string | null>(null);
   const [collapsedDomains, setCollapsedDomains] = useState<Set<string>>(new Set());
   const monthName = MONTHS[selectedMonthIndex];
   const reportContainerRef = useRef<HTMLDivElement>(null);
@@ -195,7 +195,7 @@ const ReportView: React.FC<ReportViewProps> = ({ data, selectedMonthIndex, onWee
     window.print();
   };
 
-  const handlePrintSingleItem = useCallback((itemId: number) => {
+  const handlePrintSingleItem = useCallback((itemId: string) => {
     setPrintingItemId(itemId);
     setTimeout(() => {
         window.print();

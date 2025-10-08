@@ -3,7 +3,7 @@ import { PlanItem } from './types';
 export const budsSupervisorPlan: PlanItem[] = [
     // Page 1: Internal Operations
     {
-        id: 401,
+        id: '401',
         domain: "العمليات الداخلية",
         objective: "تنفيذ خطط الإشراف التربوي",
         indicator: "تم تنفيذ 8 أنشطة للخطط والخلاصات",
@@ -17,7 +17,7 @@ export const budsSupervisorPlan: PlanItem[] = [
     },
     // Page 2: Teaching
     {
-        id: 402,
+        id: '402',
         domain: "التدريس",
         objective: "التخطيط التربوي للمنهج الدراسي",
         indicator: "تم تدريب المعلمين إعداد الخطط الفصلية لعدد 1 بنسبة 100%",
@@ -30,7 +30,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 403,
+        id: '403',
         domain: "التدريس",
         objective: "التخطيط التربوي للمنهج الدراسي",
         indicator: "تم تقديم تغذية راجعة للخطط التدريسية للمواد الدراسية لعدد ٢ بنسبة 100%",
@@ -44,7 +44,7 @@ export const budsSupervisorPlan: PlanItem[] = [
     },
     // Page 3: Specific Programs
     {
-        id: 404,
+        id: '404',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة 3 برامج نوعية للبراعم",
@@ -57,7 +57,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 405,
+        id: '405',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة 3 برامج نوعية للبراعم",
@@ -70,7 +70,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 406,
+        id: '406',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة 3 برامج نوعية للبراعم",
@@ -83,7 +83,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 407,
+        id: '407',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة 3 برامج نوعية للبراعم",
@@ -96,7 +96,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 408,
+        id: '408',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة 3 برامج نوعية للبراعم",
@@ -109,7 +109,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 409,
+        id: '409',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
@@ -122,7 +122,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 410,
+        id: '410',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
@@ -135,7 +135,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 411,
+        id: '411',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
@@ -148,7 +148,7 @@ export const budsSupervisorPlan: PlanItem[] = [
         weeklyExecution: [null, null, null, null]
     },
     {
-        id: 412,
+        id: '412',
         domain: "البرامج النوعية",
         objective: "تنفيذ البرامج النوعية وقياس أثرها",
         indicator: "تم إضافة ٢ برامج نوعية للأساسي من ٤-١٢",
@@ -162,7 +162,7 @@ export const budsSupervisorPlan: PlanItem[] = [
     },
     // Page 4: Professional Development
     {
-        id: 413,
+        id: '413',
         domain: "التنمية المهنية",
         objective: "تحديد برامج التنمية المهنية للكادر التربوي",
         indicator: "قياس أثر التدريب في الفئة المستفيدة",
@@ -176,7 +176,7 @@ export const budsSupervisorPlan: PlanItem[] = [
     },
     // Page 5: Learning Resources
     {
-        id: 414,
+        id: '414',
         domain: "وسائل ومصادر التعلم",
         objective: "تفعيل الاستخدام الأمثل لوسائل ومصادر التعلم",
         indicator: "تم تنفيذ عدد ٢ نشاط لتوعية المعلمين",
@@ -190,7 +190,7 @@ export const budsSupervisorPlan: PlanItem[] = [
     },
     // Page 6: Educational Achievement Assessment
     {
-        id: 415,
+        id: '415',
         domain: "تقويم التحصيل العلمي",
         objective: "إعداد الاختبارات طبقا لجداول المواصفات",
         indicator: "أعد المعلمون عدد 4 اختبارات",

@@ -10,7 +10,7 @@ interface SupervisorPlanTableProps {
   selectedMonthIndex: number;
   onAdd: () => void;
   onEdit: (item: PlanItem) => void;
-  onDelete: (itemId: number) => void;
+  onDelete: (itemId: string) => void;
 }
 
 const SupervisorPlanTable: React.FC<SupervisorPlanTableProps> = ({ supervisorName, plan, selectedMonthIndex, onAdd, onEdit, onDelete }) => {

@@ -24,7 +24,7 @@ const parseSupervisorPlan = (data: any[]): PlanItem[] => {
     const weeklyExecution = row['المنفذ'] ? [executed, null, null, null] : [null, null, null, null]; // Simple distribution for existing data
 
     return {
-      id: row['id'] || Date.now() + index,
+      id: String(row['id'] || crypto.randomUUID()),
       domain: row['المجال'] || 'غير محدد',
       objective: row['الهدف'] || 'غير محدد',
       indicator: row['المؤشر'] || 'غير محدد',
@@ -113,7 +113,7 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans,
     const currentPlan = plans[selectedSupervisor];
     const defaultDomain = currentPlan.length > 0 ? currentPlan[0].domain : 'غير محدد';
     const newItem: PlanItem = {
-      id: Date.now(),
+      id: crypto.randomUUID(),
       domain: defaultDomain,
       objective: '',
       indicator: '',
@@ -132,7 +132,7 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans,
     setEditingItem(item);
   }, []);
 
-  const handleDeleteItem = useCallback((itemId: number) => {
+  const handleDeleteItem = useCallback((itemId: string) => {
     if (!selectedSupervisor) return;
     if (window.confirm('هل أنت متأكد من حذف هذا النشاط؟')) {
       const newPlans = { ...plans };
@@ -171,7 +171,7 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans,
     setEditingItem(null);
   }, [selectedSupervisor, plans, onUpdatePlans]);
 
-  const handleWeeklyExecutionChange = useCallback((itemId: number, newWeeklyValues: (number | null)[]) => {
+  const handleWeeklyExecutionChange = useCallback((itemId: string, newWeeklyValues: (number | null)[]) => {
       if (!selectedSupervisor) return;
       const updatedPlan = plans[selectedSupervisor].map(item =>
           item.id === itemId
