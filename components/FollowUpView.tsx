@@ -1,10 +1,7 @@
-
-
-
 import React, { useMemo, useState } from 'react';
 import { PlanItem } from '../types';
 import { getDomainColor } from '../colors';
-import { PrintIcon } from './Icons';
+import { PrintIcon, ChevronDownIcon } from './Icons';
 import { MONTHS } from '../constants';
 import AIProgrammingAssistant from './AIProgrammingAssistant';
 import DonutChart from './DonutChart';
@@ -33,7 +30,20 @@ const MiniTimeline = ({ schedule }: { schedule: (number | null)[] }) => (
 
 const FollowUpView: React.FC<FollowUpViewProps> = ({ data }) => {
   const [filter, setFilter] = useState<'all' | 'programmed' | 'not-programmed'>('all');
+  const [collapsedDomains, setCollapsedDomains] = useState<Set<string>>(new Set());
   
+  const toggleDomain = (domain: string) => {
+    setCollapsedDomains(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(domain)) {
+        newSet.delete(domain);
+      } else {
+        newSet.add(domain);
+      }
+      return newSet;
+    });
+  };
+
   const processedData = useMemo(() => {
     const activitiesWithStatus: ActivityStatus[] = data.map(item => ({
       ...item,
@@ -175,38 +185,48 @@ const FollowUpView: React.FC<FollowUpViewProps> = ({ data }) => {
         )}
         {structuredData.map(({ domain, objectives }) => {
           const colors = getDomainColor(domain);
+          const isCollapsed = collapsedDomains.has(domain);
           return (
             <section key={domain} className="break-inside-avoid">
-              <h3 className={`text-xl font-bold p-3 rounded-t-lg ${colors.bg} ${colors.text} border-b-2 ${colors.border}`}>
-                {domain}
+              <h3 className={`text-xl font-bold p-0 ${isCollapsed ? 'rounded-lg' : 'rounded-t-lg'} ${colors.bg} ${colors.text} border-b-2 ${colors.border}`}>
+                <button
+                    onClick={() => toggleDomain(domain)}
+                    aria-expanded={!isCollapsed}
+                    aria-controls={`domain-content-followup-${domain.replace(/\s+/g, '-')}`}
+                    className="w-full flex justify-between items-center text-right p-3"
+                >
+                    <span>{domain}</span>
+                    <ChevronDownIcon className={`w-6 h-6 transform transition-transform duration-200 ${!isCollapsed ? 'rotate-180' : ''}`} />
+                </button>
               </h3>
-              <div className="border border-t-0 rounded-b-lg p-4 space-y-4">
-                {objectives.map(({ objective, activities }) => (
-                  <div key={objective}>
-                    <h4 className="text-md font-semibold text-gray-700 mb-2 p-2 bg-gray-100 rounded-md">{objective}</h4>
-                    <ul className="space-y-2">
-                      {/* FIX: Changed `activity.map` to `activities.map` to correctly reference the destructured array. */}
-                      {activities.map(activity => (
-                        <li key={activity.id} className="flex flex-col sm:flex-row justify-between sm:items-center p-2 rounded-md hover:bg-gray-50 gap-2">
-                          <span className="text-gray-800 flex-grow">{activity.activity}</span>
-                          <div className="flex items-center gap-4 flex-shrink-0">
-                                <MiniTimeline schedule={activity.schedule} />
-                                {activity.isProgrammed ? (
-                                    <span className="text-xs font-medium w-24 text-center px-2 py-1 rounded-full bg-green-200 text-green-800">
-                                    تمت برمجته
-                                    </span>
-                                ) : (
-                                    <span className="text-xs font-medium w-24 text-center px-2 py-1 rounded-full bg-red-200 text-red-800">
-                                    لم تتم برمجته
-                                    </span>
-                                )}
-                            </div>
-                        </li>
-                      ))}
-                    </ul>
+              {!isCollapsed && (
+                  <div id={`domain-content-followup-${domain.replace(/\s+/g, '-')}`} className="border border-t-0 rounded-b-lg p-4 space-y-4 animate-fade-in">
+                    {objectives.map(({ objective, activities }) => (
+                      <div key={objective}>
+                        <h4 className="text-md font-semibold text-gray-700 mb-2 p-2 bg-gray-100 rounded-md">{objective}</h4>
+                        <ul className="space-y-2">
+                          {activities.map(activity => (
+                            <li key={activity.id} className="flex flex-col sm:flex-row justify-between sm:items-center p-2 rounded-md hover:bg-gray-50 gap-2">
+                              <span className="text-gray-800 flex-grow">{activity.activity}</span>
+                              <div className="flex items-center gap-4 flex-shrink-0">
+                                    <MiniTimeline schedule={activity.schedule} />
+                                    {activity.isProgrammed ? (
+                                        <span className="text-xs font-medium w-24 text-center px-2 py-1 rounded-full bg-green-200 text-green-800">
+                                        تمت برمجته
+                                        </span>
+                                    ) : (
+                                        <span className="text-xs font-medium w-24 text-center px-2 py-1 rounded-full bg-red-200 text-red-800">
+                                        لم تتم برمجته
+                                        </span>
+                                    )}
+                                </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+              )}
             </section>
           );
         })}

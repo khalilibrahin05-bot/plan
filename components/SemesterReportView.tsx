@@ -1,9 +1,8 @@
-
-
-import React from 'react';
+import React, { useState } from 'react';
 import { PlanItem } from '../types';
 import { MONTHS } from '../constants';
 import { getDomainColor } from '../colors';
+import { ChevronDownIcon } from './Icons';
 
 interface SemesterReportViewProps {
   data: PlanItem[];
@@ -11,6 +10,20 @@ interface SemesterReportViewProps {
 }
 
 const SemesterReportView: React.FC<SemesterReportViewProps> = ({ data, selectedMonthIndex }) => {
+  const [collapsedDomains, setCollapsedDomains] = useState<Set<string>>(new Set());
+
+  const toggleDomain = (domain: string) => {
+    setCollapsedDomains(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(domain)) {
+        newSet.delete(domain);
+      } else {
+        newSet.add(domain);
+      }
+      return newSet;
+    });
+  };
+
   const semesterIndices = [
     selectedMonthIndex,
     (selectedMonthIndex + 1) % 12,
@@ -104,22 +117,33 @@ const SemesterReportView: React.FC<SemesterReportViewProps> = ({ data, selectedM
             ) : (
                Object.keys(month.groupedData).map(domain => {
                 const colors = getDomainColor(domain);
+                const isCollapsed = collapsedDomains.has(domain);
                 return (
                   <section key={domain} className="mb-6 break-inside-avoid">
-                    <h4 className={`text-lg font-bold p-2 rounded-t-lg ${colors.bg} ${colors.text} border-b-2 ${colors.border}`}>
-                      {domain}
+                    <h4 className={`text-lg font-bold p-0 ${isCollapsed ? 'rounded-lg' : 'rounded-t-lg'} ${colors.bg} ${colors.text} border-b-2 ${colors.border}`}>
+                      <button
+                        onClick={() => toggleDomain(domain)}
+                        aria-expanded={!isCollapsed}
+                        aria-controls={`domain-content-sem-${domain.replace(/\s+/g, '-')}-${month.monthIndex}`}
+                        className="w-full flex justify-between items-center text-right p-2"
+                      >
+                          <span>{domain}</span>
+                          <ChevronDownIcon className={`w-5 h-5 transform transition-transform duration-200 ${!isCollapsed ? 'rotate-180' : ''}`} />
+                      </button>
                     </h4>
-                    <div className="border border-t-0 rounded-b-lg p-4">
-                      {month.groupedData[domain].map(item => (
-                         <div key={item.id} className="grid grid-cols-1 md:grid-cols-6 gap-x-4 gap-y-1 py-2 border-b last:border-0">
-                            <p className="md:col-span-3 font-semibold text-primary/80">{item.activity}</p>
-                            <div className="md:col-span-3 grid grid-cols-2 gap-x-4">
-                              <p><span className="font-semibold text-gray-500">عدد المؤشر:</span> {item.indicatorCount ?? '-'}</p>
-                              <p><span className="font-semibold text-gray-500">العدد للشهر:</span> <span className="font-bold text-green-600">{item.schedule[month.monthIndex]}</span></p>
+                    {!isCollapsed && (
+                        <div id={`domain-content-sem-${domain.replace(/\s+/g, '-')}-${month.monthIndex}`} className="border border-t-0 rounded-b-lg p-4 animate-fade-in">
+                        {month.groupedData[domain].map(item => (
+                            <div key={item.id} className="grid grid-cols-1 md:grid-cols-6 gap-x-4 gap-y-1 py-2 border-b last:border-0">
+                                <p className="md:col-span-3 font-semibold text-primary/80">{item.activity}</p>
+                                <div className="md:col-span-3 grid grid-cols-2 gap-x-4">
+                                <p><span className="font-semibold text-gray-500">عدد المؤشر:</span> {item.indicatorCount ?? '-'}</p>
+                                <p><span className="font-semibold text-gray-500">العدد للشهر:</span> <span className="font-bold text-green-600">{item.schedule[month.monthIndex]}</span></p>
+                                </div>
                             </div>
-                         </div>
-                      ))}
-                    </div>
+                        ))}
+                        </div>
+                    )}
                   </section>
                 );
               })

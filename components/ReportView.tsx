@@ -5,7 +5,7 @@ import { getDomainColor } from '../colors';
 import GroupedBarChart from './GroupedBarChart';
 import WeeklyTracker from './WeeklyTracker';
 import AIAnalyst from './AIAnalyst';
-import { ExcelIcon, PlusIcon, TrashIcon } from './Icons';
+import { ExcelIcon, PlusIcon, TrashIcon, ChevronDownIcon } from './Icons';
 
 // Declare XLSX to avoid TypeScript errors for the global variable from CDN
 declare const XLSX: any;
@@ -62,6 +62,7 @@ interface ReportViewProps {
 
 const ReportView: React.FC<ReportViewProps> = ({ data, selectedMonthIndex, onWeeklyExecutionChange }) => {
   const [printingItemId, setPrintingItemId] = useState<number | null>(null);
+  const [collapsedDomains, setCollapsedDomains] = useState<Set<string>>(new Set());
   const monthName = MONTHS[selectedMonthIndex];
   const reportContainerRef = useRef<HTMLDivElement>(null);
 
@@ -156,6 +157,18 @@ const ReportView: React.FC<ReportViewProps> = ({ data, selectedMonthIndex, onWee
       }));
   };
   
+  const toggleDomain = (domain: string) => {
+    setCollapsedDomains(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(domain)) {
+        newSet.delete(domain);
+      } else {
+        newSet.add(domain);
+      }
+      return newSet;
+    });
+  };
+
   const filteredData = data.filter(item => {
     const scheduleValue = item.schedule[selectedMonthIndex];
     return typeof scheduleValue === 'number' && scheduleValue > 0;
@@ -298,24 +311,35 @@ const ReportView: React.FC<ReportViewProps> = ({ data, selectedMonthIndex, onWee
         <div className="space-y-8">
           {Object.keys(groupedData).map(domain => {
             const colors = getDomainColor(domain);
+            const isCollapsed = collapsedDomains.has(domain);
             return (
               <section key={domain} className="break-inside-avoid">
-                <h3 className={`text-xl font-bold p-3 rounded-t-lg ${colors.bg} ${colors.text} border-b-2 ${colors.border} no-print-when-item-printing`}>
-                  {domain}
+                <h3 className={`text-xl font-bold p-0 ${isCollapsed ? 'rounded-lg' : 'rounded-t-lg'} ${colors.bg} ${colors.text} border-b-2 ${colors.border} no-print-when-item-printing`}>
+                    <button
+                        onClick={() => toggleDomain(domain)}
+                        aria-expanded={!isCollapsed}
+                        aria-controls={`domain-content-${domain.replace(/\s+/g, '-')}`}
+                        className="w-full flex justify-between items-center text-right p-3"
+                    >
+                        <span>{domain}</span>
+                        <ChevronDownIcon className={`w-6 h-6 transform transition-transform duration-200 ${!isCollapsed ? 'rotate-180' : ''}`} />
+                    </button>
                 </h3>
-                <div className="space-y-6 border border-t-0 rounded-b-lg p-4">
-                  {groupedData[domain].map(item => (
-                     <ReportItemCard
-                        key={item.id}
-                        item={item}
-                        selectedMonthIndex={selectedMonthIndex}
-                        monthName={monthName}
-                        printingItemId={printingItemId}
-                        onWeeklyExecutionChange={onWeeklyExecutionChange}
-                        onPrintSingleItem={handlePrintSingleItem}
-                     />
-                  ))}
-                </div>
+                {!isCollapsed && (
+                    <div id={`domain-content-${domain.replace(/\s+/g, '-')}`} className="space-y-6 border border-t-0 rounded-b-lg p-4 animate-fade-in">
+                      {groupedData[domain].map(item => (
+                         <ReportItemCard
+                            key={item.id}
+                            item={item}
+                            selectedMonthIndex={selectedMonthIndex}
+                            monthName={monthName}
+                            printingItemId={printingItemId}
+                            onWeeklyExecutionChange={onWeeklyExecutionChange}
+                            onPrintSingleItem={handlePrintSingleItem}
+                         />
+                      ))}
+                    </div>
+                )}
               </section>
             );
           })}
