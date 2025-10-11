@@ -22,9 +22,26 @@ const PlanTableRow: React.FC<PlanTableRowProps> = React.memo(({
   onEdit,
 }) => {
   const colors = getDomainColor(domain);
+
+  // Highlighting logic
+  const plannedForMonth = item.schedule[selectedMonthIndex] ?? 0;
+  const isPlannedForMonth = plannedForMonth > 0;
+  const isUnderExecuted = (item.executed ?? 0) < plannedForMonth;
+  const needsHighlight = isPlannedForMonth && isUnderExecuted;
+
+  // Ensure weeklyExecution is always an array of 4 for consistent rendering
+  const weeklyValues = [...(item.weeklyExecution || [null, null, null, null])];
+  while (weeklyValues.length < 4) {
+    weeklyValues.push(null);
+  }
+
   return (
     <tr
-      className={`border-b ${colors.bg} ${colors.hoverBg} transition-colors duration-150`}
+      className={`border-b transition-colors duration-150 ${
+        needsHighlight
+          ? 'bg-amber-100 hover:bg-amber-200'
+          : `${colors.bg} ${colors.hoverBg}`
+      }`}
     >
       {isFirstInDomain && (
         <td
@@ -62,6 +79,14 @@ const PlanTableRow: React.FC<PlanTableRowProps> = React.memo(({
       <td className="px-1 py-2 text-center font-bold text-green-700 col-executed">
         {item.executed || '-'}
       </td>
+       {weeklyValues.map((value, index) => (
+        <td
+          key={`week-${index}`}
+          className="px-1 py-2 text-center font-mono bg-gray-50 no-print"
+        >
+          {value || '-'}
+        </td>
+      ))}
       <td className="px-2 py-2 text-center no-print">
         <button
           onClick={() => onEdit(item)}
@@ -154,7 +179,7 @@ const PlanTable: React.FC<PlanTableProps> = ({ data, selectedMonthIndex, onEdit,
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-x-auto">
-      <table className="w-full min-w-[1800px] text-sm text-right text-gray-600">
+      <table className="w-full min-w-[2200px] text-sm text-right text-gray-600">
         <thead className="text-xs text-gray-700 uppercase bg-gray-200 sticky top-0 z-10">
           <tr>
             <th scope="col" className="px-2 py-2 min-w-[180px]">المجال</th>
@@ -185,13 +210,17 @@ const PlanTable: React.FC<PlanTableProps> = ({ data, selectedMonthIndex, onEdit,
               );
             })}
             <th scope="col" className="px-1 py-2 col-executed">المنفذ</th>
+            <th scope="col" className="px-1 py-2 no-print bg-gray-100">أسبوع ١</th>
+            <th scope="col" className="px-1 py-2 no-print bg-gray-100">أسبوع ٢</th>
+            <th scope="col" className="px-1 py-2 no-print bg-gray-100">أسبوع ٣</th>
+            <th scope="col" className="px-1 py-2 no-print bg-gray-100">أسبوع ٤</th>
             <th scope="col" className="px-2 py-2 no-print">تعديل</th>
           </tr>
         </thead>
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={21} className="text-center py-12 text-gray-500 text-lg">
+              <td colSpan={25} className="text-center py-12 text-gray-500 text-lg">
                 لا توجد أنشطة تطابق بحثك.
               </td>
             </tr>
