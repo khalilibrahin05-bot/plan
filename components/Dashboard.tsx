@@ -2,7 +2,7 @@ import React from 'react';
 import { 
     TableIcon, DocumentReportIcon, CalendarReportIcon, DocumentTextIcon,
     ChecklistIcon, BookOpenIcon, SparklesIcon, CalendarIcon,
-    WrenchScrewdriverIcon, LibraryIcon, ChartPieIcon, UserGroupIcon, ShieldCheckIcon
+    WrenchScrewdriverIcon, LibraryIcon, ChartPieIcon, UserGroupIcon, ShieldCheckIcon, KeyIcon
 } from './Icons';
 import { View } from '../App';
 
@@ -18,6 +18,7 @@ const views = [
     { view: 'statistics', icon: <ChartPieIcon />, title: 'الإحصائيات', description: 'تحليلات ورسوم بيانية حول توزيع الخطة.' },
     { view: 'follow-up', icon: <ChecklistIcon />, title: 'متابعة البرمجة', description: 'تتبع الأنشطة المبرمجة وغير المبرمجة.' },
     { view: 'supervisors', icon: <UserGroupIcon />, title: 'خطط المشرفين', description: 'استيراد وعرض خطط المشرفين التربويين.' },
+    { view: 'strategic-plan', icon: <KeyIcon />, title: 'الخطة الاستراتيجية', description: 'عرض وإدارة المبادرات والأهداف طويلة المدى.' },
     { view: 'framework', icon: <LibraryIcon />, title: 'الإطار المرجعي للإشراف', description: 'تصفح معايير ومؤشرات الإشراف التربوي.' },
     { view: 'unified-glossary', icon: <BookOpenIcon />, title: 'القواميس', description: 'شرح مصطلحات الخطة والمصطلحات التربوية.' },
     { view: 'ai-tools', icon: <SparklesIcon />, title: 'أدوات الذكاء الاصطناعي', description: 'استخدام AI لتحليل وتلخيص التقارير.' },

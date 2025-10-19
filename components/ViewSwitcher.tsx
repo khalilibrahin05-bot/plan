@@ -13,7 +13,8 @@ import {
     ChartPieIcon,
     UserGroupIcon,
     ShieldCheckIcon,
-    ChevronDownIcon
+    ChevronDownIcon,
+    KeyIcon
 } from './Icons';
 import { View } from '../App';
 
@@ -31,6 +32,7 @@ const allViews = [
     { view: 'statistics', icon: <ChartPieIcon />, title: 'الإحصائيات' },
     { view: 'follow-up', icon: <ChecklistIcon />, title: 'متابعة البرمجة' },
     { view: 'supervisors', icon: <UserGroupIcon />, title: 'خطط المشرفين' },
+    { view: 'strategic-plan', icon: <KeyIcon />, title: 'الخطة الاستراتيجية' },
     { view: 'framework', icon: <LibraryIcon />, title: 'الإطار المرجعي للإشراف' },
     { view: 'unified-glossary', icon: <BookOpenIcon />, title: 'القواميس' },
     { view: 'ai-tools', icon: <SparklesIcon />, title: 'أدوات الذكاء الاصطناعي' },

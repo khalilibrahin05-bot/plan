@@ -52,6 +52,7 @@ const EventsView: React.FC = () => {
                 <div>
                     <h4 className="font-bold text-gray-800">{event.name}</h4>
                     <p className={`text-sm font-semibold ${styles.text}`}>{EventTypeNames[event.type]}</p>
+                    <p className="text-xs text-gray-600 mt-1">{event.description}</p>
                 </div>
             </div>
         );
@@ -98,12 +99,17 @@ const EventsView: React.FC = () => {
                             <h4 className="text-lg font-semibold bg-gray-100 p-2 rounded-md mb-3">{monthName}</h4>
                             <ul className="space-y-2">
                                 {events.map(event => (
-                                    <li key={`${event.day}-${event.name}`} className="flex items-center space-x-4 space-x-reverse ml-4 p-2 rounded-md hover:bg-gray-50">
-                                        <span className={`w-20 text-center flex-shrink-0 font-bold ${EventTypeStyles[event.type].text}`}>{event.day} {monthName}</span>
-                                        <span className="text-gray-800 flex-grow">{event.name}</span>
-                                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${EventTypeStyles[event.type].bg} ${EventTypeStyles[event.type].text}`}>
-                                            {EventTypeNames[event.type]}
-                                        </span>
+                                    <li key={`${event.day}-${event.name}`} className="flex items-start space-x-4 space-x-reverse ml-4 p-2 rounded-md hover:bg-gray-50">
+                                        <span className={`w-20 text-center pt-1 flex-shrink-0 font-bold ${EventTypeStyles[event.type].text}`}>{event.day} {monthName}</span>
+                                        <div className="flex-grow">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-800 font-semibold">{event.name}</span>
+                                                <span className={`text-xs font-medium px-2 py-1 rounded-full ${EventTypeStyles[event.type].bg} ${EventTypeStyles[event.type].text}`}>
+                                                    {EventTypeNames[event.type]}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-gray-600 mt-1">{event.description}</p>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>

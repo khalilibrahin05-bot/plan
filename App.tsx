@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense, useRef } from 'react';
 import { PlanItem, PrintSettings } from './types';
 import { initialPlanData } from './data';
+import { strategicPlanData } from './strategicPlanData';
 import { englishSupervisorPlan } from './englishSupervisorPlan';
 import { literarySupervisorPlan } from './literarySupervisorPlan';
 import { scienceSupervisorPlan } from './scienceSupervisorPlan';
@@ -31,13 +32,15 @@ const FrameworkView = lazy(() => import('./components/FrameworkView'));
 const SupervisorsView = lazy(() => import('./components/SupervisorsView'));
 const SummaryView = lazy(() => import('./components/SummaryView'));
 const ControlPanelView = lazy(() => import('./components/ControlPanelView'));
+const StrategicPlanView = lazy(() => import('./components/StrategicPlanView'));
 const EditModal = lazy(() => import('./components/EditModal'));
 const PrintSettingsModal = lazy(() => import('./components/PrintSettingsModal'));
 
 
-export type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors' | 'control-panel';
+export type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors' | 'control-panel' | 'strategic-plan';
 const LOCAL_STORAGE_KEY = 'educationalPlanData';
 const INITIAL_PLAN_DATA_KEY = 'educationalPlanInitialData';
+const STRATEGIC_PLAN_KEY = 'educationalPlanStrategicData';
 const ARCHIVED_PLAN_KEY = 'educationalPlanArchivedData';
 const LOGO_STORAGE_KEY = 'educationalPlanLogo';
 const FONT_SETTINGS_KEY = 'educationalPlanFontSettings';
@@ -101,6 +104,18 @@ const App: React.FC = () => {
     return initialPlan;
   });
 
+  const [strategicPlan, setStrategicPlan] = useState<PlanItem[]>(() => {
+    try {
+      const savedData = localStorage.getItem(STRATEGIC_PLAN_KEY);
+      if (savedData) {
+        return JSON.parse(savedData);
+      }
+    } catch (error) {
+      console.error("Failed to parse strategic plan data from localStorage", error);
+    }
+    return strategicPlanData;
+  });
+
   const [fontSettings, setFontSettings] = useState(() => {
     try {
       const savedSettings = localStorage.getItem(FONT_SETTINGS_KEY);
@@ -149,6 +164,7 @@ const App: React.FC = () => {
 
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number>(0);
   const [editingItem, setEditingItem] = useState<PlanItem | null>(null);
+  const [editingStrategicItem, setEditingStrategicItem] = useState<PlanItem | null>(null);
   const [viewMode, setViewMode] = useState<View | 'dashboard'>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [isPrintSettingsModalOpen, setIsPrintSettingsModalOpen] = useState(false);
@@ -167,6 +183,14 @@ const App: React.FC = () => {
       console.error("Failed to save plan data to localStorage", error);
     }
   }, [planData]);
+  
+  useEffect(() => {
+    try {
+      localStorage.setItem(STRATEGIC_PLAN_KEY, JSON.stringify(strategicPlan));
+    } catch (error) {
+      console.error("Failed to save strategic plan data to localStorage", error);
+    }
+  }, [strategicPlan]);
 
   useEffect(() => {
     try {
@@ -224,6 +248,7 @@ const App: React.FC = () => {
     if (window.confirm("هل أنت متأكد من رغبتك في إعادة تعيين البيانات؟ سيتم فقدان جميع التغييرات والعودة إلى الخطة الأصلية.")) {
       setPlanData(initialPlan);
       setSupervisorsPlans(defaultSupervisorPlans);
+      setStrategicPlan(strategicPlanData);
     }
   }, [initialPlan, defaultSupervisorPlans]);
 
@@ -231,6 +256,7 @@ const App: React.FC = () => {
     setSaveStatus('saving');
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(planData));
+      localStorage.setItem(STRATEGIC_PLAN_KEY, JSON.stringify(strategicPlan));
       localStorage.setItem(FONT_SETTINGS_KEY, JSON.stringify(fontSettings));
       localStorage.setItem(PRINT_SETTINGS_KEY, JSON.stringify(printSettings));
       localStorage.setItem(THEME_KEY, themeId);
@@ -246,7 +272,7 @@ const App: React.FC = () => {
       console.error("Failed to manually save data to localStorage", error);
       setSaveStatus('idle');
     }
-  }, [planData, fontSettings, printSettings, themeId, supervisorsPlans]);
+  }, [planData, strategicPlan, fontSettings, printSettings, themeId, supervisorsPlans]);
   
   const handleSyncData = useCallback(() => {
     setSyncStatus('syncing');
@@ -258,6 +284,10 @@ const App: React.FC = () => {
       // Plan Data
       const savedPlanData = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedPlanData) setPlanData(JSON.parse(savedPlanData));
+      
+      // Strategic Plan
+      const savedStrategicPlan = localStorage.getItem(STRATEGIC_PLAN_KEY);
+      if (savedStrategicPlan) setStrategicPlan(JSON.parse(savedStrategicPlan));
 
       // Supervisors Plans
       const savedSupervisorsPlans = localStorage.getItem(SUPERVISORS_PLANS_KEY);
@@ -411,6 +441,49 @@ const App: React.FC = () => {
     setEditingItem(null);
   }, []);
   
+    const handleEditStrategicItem = useCallback((item: PlanItem) => {
+        setEditingStrategicItem(item);
+    }, []);
+
+    const handleCloseStrategicModal = useCallback(() => {
+        setEditingStrategicItem(null);
+    }, []);
+
+    const handleSaveStrategicItem = useCallback((updatedItem: PlanItem) => {
+        setStrategicPlan(prevData => {
+            const itemExists = prevData.some(i => i.id === updatedItem.id);
+            if (itemExists) {
+                return prevData.map(item => (item.id === updatedItem.id ? updatedItem : item));
+            } else {
+                return [...prevData, updatedItem];
+            }
+        });
+        setEditingStrategicItem(null);
+    }, []);
+
+    const handleAddStrategicItem = useCallback(() => {
+        const newItem: PlanItem = {
+            id: crypto.randomUUID(),
+            domain: 'الخطة الاستراتيجية',
+            objective: '',
+            indicator: '',
+            evidence: '',
+            activity: '',
+            planned: 0,
+            schedule: Array(12).fill(null),
+            executed: 0,
+            indicatorCount: null,
+            weeklyExecution: [null, null, null, null],
+        };
+        setEditingStrategicItem(newItem);
+    }, []);
+
+    const handleDeleteStrategicItem = useCallback((itemId: string) => {
+        if (window.confirm('هل أنت متأكد من حذف هذه المبادرة؟')) {
+            setStrategicPlan(prevData => prevData.filter(item => item.id !== itemId));
+        }
+    }, []);
+
   const handleWeeklyExecutionChange = useCallback((itemId: string, newWeeklyValues: (number | null)[]) => {
     setPlanData(prevData =>
       prevData.map(item =>
@@ -492,6 +565,13 @@ const App: React.FC = () => {
                 />;
       case 'control-panel':
         return <ControlPanelView />;
+      case 'strategic-plan':
+        return <StrategicPlanView 
+                    data={strategicPlan}
+                    onAdd={handleAddStrategicItem}
+                    onEdit={handleEditStrategicItem}
+                    onDelete={handleDeleteStrategicItem}
+                />;
       default:
         return null;
     }
@@ -635,6 +715,14 @@ const App: React.FC = () => {
             isOpen={!!editingItem}
             onClose={handleCloseModal}
             onSave={handleSaveItem}
+          />
+        )}
+        {editingStrategicItem && (
+          <EditModal
+            item={editingStrategicItem}
+            isOpen={!!editingStrategicItem}
+            onClose={handleCloseStrategicModal}
+            onSave={handleSaveStrategicItem}
           />
         )}
         {isPrintSettingsModalOpen && (
