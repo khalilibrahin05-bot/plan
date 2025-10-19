@@ -36,15 +36,34 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ data }) => {
             const monthlyTotal = data.reduce((sum, item) => sum + (item.schedule[index] || 0), 0);
             return { label: month, value: monthlyTotal };
         });
+        
+        const monthColors = ['#38bdf8', '#818cf8', '#f472b6', '#fb923c', '#a78bfa', '#34d399', '#facc15', '#fb7185', '#4f46e5', '#db2777', '#9333ea', '#16a34a'];
+
+        const activitiesByDomainChartData = Object.entries(activitiesByDomain).map(([label, value]) => ({
+            label,
+            value,
+            color: getDomainColor(label).hex,
+        }));
+
+        const plannedTasksByDomainChartData = Object.entries(plannedTasksByDomain).map(([label, value]) => ({
+            label,
+            value,
+            color: getDomainColor(label).hex,
+        }));
+        
+        const plannedTasksByMonthChartData = plannedTasksByMonth.map((item, index) => ({
+            ...item,
+            color: monthColors[index % monthColors.length]
+        }));
 
         return {
             totalDomains: domains.size,
             totalObjectives: objectives.size,
             totalActivities,
             totalPlannedTasks,
-            activitiesByDomainChart: Object.entries(activitiesByDomain).map(([label, value]) => ({ label, value })),
-            plannedTasksByDomainChart: Object.entries(plannedTasksByDomain).map(([label, value]) => ({ label, value })),
-            plannedTasksByMonthChart: plannedTasksByMonth,
+            activitiesByDomainChart: activitiesByDomainChartData,
+            plannedTasksByDomainChart: plannedTasksByDomainChartData,
+            plannedTasksByMonthChart: plannedTasksByMonthChartData,
             domainSummary: Object.keys(activitiesByDomain).map(domain => ({
                 domain,
                 activities: activitiesByDomain[domain] || 0,
@@ -59,24 +78,11 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ data }) => {
 
     const donutChartData = useMemo(() => {
         if (!stats) return [];
-        return stats.activitiesByDomainChart.map(item => {
-            const domainName = item.label;
-            const colors = getDomainColor(domainName);
-            // Mapping background utility classes to stronger hex codes for charts
-            const colorMap: Record<string, string> = {
-                'bg-blue-50': '#3b82f6',
-                'bg-green-50': '#22c55e',
-                'bg-purple-50': '#a855f7',
-                'bg-yellow-50': '#eab308',
-                'bg-red-50': '#ef4444',
-                'bg-gray-50': '#6b7280',
-            };
-            return {
-                label: domainName,
-                value: item.value,
-                color: colorMap[colors.bg] || '#6b7280',
-            };
-        });
+        return stats.activitiesByDomainChart.map(item => ({
+            label: item.label,
+            value: item.value,
+            color: item.color || '#6b7280',
+        }));
     }, [stats]);
 
 
@@ -93,40 +99,40 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ data }) => {
     }
     
     return (
-        <div id="report-view" className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-lg">
-            <div className="no-print flex justify-between items-center mb-6 pb-4 border-b">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+        <div id="report-view" className="bg-white dark:bg-gray-800 p-4 sm:p-6 md:p-8 rounded-lg shadow-lg">
+            <div className="no-print flex justify-between items-center mb-6 pb-4 border-b dark:border-gray-700">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-3">
                     <ChartPieIcon />
                     <span>إحصائيات الخطة</span>
                 </h2>
                 <button
                     onClick={handlePrint}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-2"
+                    className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 flex items-center gap-2"
                 >
                     <PrintIcon />
                     <span>طباعة</span>
                 </button>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-6 print:block hidden">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 text-center mb-6 print:block hidden">
                 إحصائيات الخطة
             </h2>
             
             <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 break-inside-avoid">
-                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
-                    <h3 className="text-sm font-medium text-blue-800">إجمالي المجالات</h3>
-                    <p className="text-3xl font-bold text-blue-900 mt-1">{stats.totalDomains}</p>
+                <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
+                    <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">إجمالي المجالات</h3>
+                    <p className="text-3xl font-bold text-blue-900 dark:text-blue-100 mt-1">{stats.totalDomains}</p>
                 </div>
-                <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm">
-                    <h3 className="text-sm font-medium text-green-800">إجمالي الأهداف</h3>
-                    <p className="text-3xl font-bold text-green-900 mt-1">{stats.totalObjectives}</p>
+                <div className="bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 p-4 rounded-lg shadow-sm">
+                    <h3 className="text-sm font-medium text-green-800 dark:text-green-200">إجمالي الأهداف</h3>
+                    <p className="text-3xl font-bold text-green-900 dark:text-green-100 mt-1">{stats.totalObjectives}</p>
                 </div>
-                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg shadow-sm">
-                    <h3 className="text-sm font-medium text-yellow-800">إجمالي الأنشطة</h3>
-                    <p className="text-3xl font-bold text-yellow-900 mt-1">{stats.totalActivities}</p>
+                <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 p-4 rounded-lg shadow-sm">
+                    <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">إجمالي الأنشطة</h3>
+                    <p className="text-3xl font-bold text-yellow-900 dark:text-yellow-100 mt-1">{stats.totalActivities}</p>
                 </div>
-                <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-lg shadow-sm">
-                    <h3 className="text-sm font-medium text-purple-800">إجمالي المهام المخططة</h3>
-                    <p className="text-3xl font-bold text-purple-900 mt-1">{stats.totalPlannedTasks}</p>
+                <div className="bg-purple-50 dark:bg-purple-900/30 border-l-4 border-purple-500 p-4 rounded-lg shadow-sm">
+                    <h3 className="text-sm font-medium text-purple-800 dark:text-purple-200">إجمالي المهام المخططة</h3>
+                    <p className="text-3xl font-bold text-purple-900 dark:text-purple-100 mt-1">{stats.totalPlannedTasks}</p>
                 </div>
             </section>
             
@@ -140,10 +146,10 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ data }) => {
             </section>
 
             <section className="break-inside-avoid">
-                 <h3 className="text-xl font-bold text-gray-700 mb-4">ملخص المجالات</h3>
-                 <div className="overflow-x-auto border rounded-lg">
-                    <table className="w-full text-sm text-right text-gray-600">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+                 <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4">ملخص المجالات</h3>
+                 <div className="overflow-x-auto border dark:border-gray-700 rounded-lg">
+                    <table className="w-full text-sm text-right text-gray-600 dark:text-gray-300">
+                        <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-100 dark:bg-gray-700">
                             <tr>
                                 <th className="px-4 py-3">المجال</th>
                                 <th className="px-4 py-3 text-center">عدد الأنشطة</th>
@@ -154,7 +160,7 @@ const StatisticsView: React.FC<StatisticsViewProps> = ({ data }) => {
                             {stats.domainSummary.map(({ domain, activities, tasks }) => {
                                 const colors = getDomainColor(domain);
                                 return (
-                                <tr key={domain} className={`border-b ${colors.bg} hover:bg-opacity-50`}>
+                                <tr key={domain} className={`border-b dark:border-gray-700 ${colors.bg} hover:bg-opacity-50`}>
                                     <td className={`px-4 py-3 font-semibold ${colors.text}`}>{domain}</td>
                                     <td className="px-4 py-3 text-center font-bold text-lg">{activities}</td>
                                     <td className="px-4 py-3 text-center font-bold text-lg">{tasks}</td>

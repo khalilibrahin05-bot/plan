@@ -26,6 +26,7 @@ interface ViewSwitcherProps {
 
 const allViews = [
     { view: 'table', icon: <TableIcon />, title: 'القائمة الرئيسية' },
+    { view: 'calendar', icon: <CalendarIcon />, title: 'عرض التقويم' },
     { view: 'report', icon: <DocumentReportIcon />, title: 'التقرير الشهري' },
     { view: 'semester', icon: <CalendarReportIcon />, title: 'التقرير الفصلي' },
     { view: 'summary', icon: <DocumentTextIcon />, title: 'خلاصة التقارير' },
@@ -41,7 +42,7 @@ const allViews = [
     { view: 'control-panel', icon: <ShieldCheckIcon />, title: 'لوحة التحكم' },
 ];
 
-const primaryViews = ['table', 'report', 'summary', 'statistics'];
+const primaryViews = ['table', 'calendar', 'report', 'summary', 'statistics'];
 const primaryViewData = allViews.filter(v => primaryViews.includes(v.view));
 const secondaryViewData = allViews.filter(v => !primaryViews.includes(v.view));
 
@@ -61,12 +62,12 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewChange }
     }, [dropdownRef]);
   
   return (
-    <div className="flex items-center space-x-1 space-x-reverse rounded-md bg-gray-200 p-1 flex-wrap justify-center">
+    <div className="flex items-center space-x-1 space-x-reverse rounded-md bg-gray-200 dark:bg-gray-700/50 p-1 flex-wrap justify-center">
       {primaryViewData.map(({ view, icon, title }) => {
         const isActive = currentView === view;
         const baseClasses = "p-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary";
         const activeClasses = "bg-primary text-white shadow";
-        const inactiveClasses = "bg-white text-gray-600 hover:bg-gray-100 hover:text-primary";
+        const inactiveClasses = "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-primary";
         
         return (
           <button
@@ -86,7 +87,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewChange }
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsDropdownOpen(prev => !prev)}
-          className="flex items-center gap-1 p-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary bg-white text-gray-600 hover:bg-gray-100 hover:text-primary"
+          className="flex items-center gap-1 p-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-primary"
           aria-haspopup="true"
           aria-expanded={isDropdownOpen}
         >
@@ -95,7 +96,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewChange }
         </button>
         
         {isDropdownOpen && (
-            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-30">
+            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black dark:ring-gray-700 ring-opacity-5 z-30">
                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                     {secondaryViewData.map(({ view, icon, title }) => (
                         <button
@@ -104,7 +105,7 @@ const ViewSwitcher: React.FC<ViewSwitcherProps> = ({ currentView, onViewChange }
                                 onViewChange(view as View);
                                 setIsDropdownOpen(false);
                             }}
-                            className={`w-full text-right flex items-center gap-3 px-4 py-2 text-sm ${currentView === view ? 'bg-gray-100 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-100'}`}
+                            className={`w-full text-right flex items-center gap-3 px-4 py-2 text-sm ${currentView === view ? 'bg-gray-100 dark:bg-gray-700 text-primary font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                             role="menuitem"
                         >
                             {React.cloneElement(icon, { className: "h-5 w-5" })}

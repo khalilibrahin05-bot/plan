@@ -37,16 +37,16 @@ const PlanTableRow: React.FC<PlanTableRowProps> = React.memo(({
 
   return (
     <tr
-      className={`border-b transition-colors duration-150 ${
+      className={`border-b dark:border-gray-700 transition-colors duration-150 ${
         needsHighlight
-          ? 'bg-amber-100 hover:bg-amber-200'
+          ? 'bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:hover:bg-amber-900'
           : `${colors.bg} ${colors.hoverBg}`
       }`}
     >
       {isFirstInDomain && (
         <td
           rowSpan={domainRowCount}
-          className={`px-2 py-2 font-semibold align-top border-l ${colors.text} ${colors.border} min-w-[180px] max-w-[180px]`}
+          className={`px-2 py-2 font-semibold align-top border-l dark:border-gray-700 ${colors.text} ${colors.border} min-w-[180px] max-w-[180px]`}
         >
           {domain}
         </td>
@@ -61,11 +61,11 @@ const PlanTableRow: React.FC<PlanTableRowProps> = React.memo(({
         const isFirstSemesterPart = index < 4;
         let cellClasses = 'col-schedule';
         if (index === selectedMonthIndex) {
-          cellClasses += ' bg-blue-200/50 text-blue-900 font-bold';
+          cellClasses += ' bg-blue-200/50 text-blue-900 dark:bg-blue-800/50 dark:text-blue-100 font-bold';
         } else if (isFirstSemesterPart) {
-          cellClasses += ' bg-green-50 text-green-900 font-bold';
+          cellClasses += ' bg-green-50 text-green-900 dark:bg-green-900/30 dark:text-green-200 font-bold';
         } else {
-          cellClasses += ' bg-orange-50 text-orange-900 font-bold';
+          cellClasses += ' bg-orange-50 text-orange-900 dark:bg-orange-900/40 dark:text-orange-200 font-bold';
         }
         return (
           <td
@@ -76,13 +76,13 @@ const PlanTableRow: React.FC<PlanTableRowProps> = React.memo(({
           </td>
         );
       })}
-      <td className="px-1 py-2 text-center font-bold text-green-700 col-executed">
+      <td className="px-1 py-2 text-center font-bold text-green-700 dark:text-green-400 col-executed">
         {item.executed || '-'}
       </td>
        {weeklyValues.map((value, index) => (
         <td
           key={`week-${index}`}
-          className="px-1 py-2 text-center font-mono bg-gray-50 no-print"
+          className="px-1 py-2 text-center font-mono bg-gray-50 dark:bg-gray-700/50 no-print"
         >
           {value || '-'}
         </td>
@@ -178,9 +178,9 @@ const PlanTable: React.FC<PlanTableProps> = ({ data, selectedMonthIndex, onEdit,
   }, [isPrinting, onPrintComplete, handlePrint]);
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-x-auto">
-      <table className="w-full min-w-[2200px] text-sm text-right text-gray-600">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-200 sticky top-0 z-10">
+    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-x-auto">
+      <table className="w-full min-w-[2200px] text-sm text-right text-gray-600 dark:text-gray-300">
+        <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-200 dark:bg-gray-700 sticky top-0 z-10">
           <tr>
             <th scope="col" className="px-2 py-2 min-w-[180px]">المجال</th>
             <th scope="col" className="px-2 py-2 min-w-[250px] col-objective">الأهداف</th>
@@ -193,11 +193,11 @@ const PlanTable: React.FC<PlanTableProps> = ({ data, selectedMonthIndex, onEdit,
                const isFirstSemesterPart = index < 4;
                let monthBgClass = '';
                if (index === selectedMonthIndex) {
-                   monthBgClass = 'bg-blue-200 text-blue-800';
+                   monthBgClass = 'bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
                } else if (isFirstSemesterPart) {
-                   monthBgClass = 'bg-green-100';
+                   monthBgClass = 'bg-green-100 dark:bg-green-900/50';
                } else {
-                   monthBgClass = 'bg-orange-100';
+                   monthBgClass = 'bg-orange-100 dark:bg-orange-900/50';
                }
               return (
                 <th
@@ -210,17 +210,17 @@ const PlanTable: React.FC<PlanTableProps> = ({ data, selectedMonthIndex, onEdit,
               );
             })}
             <th scope="col" className="px-1 py-2 col-executed">المنفذ</th>
-            <th scope="col" className="px-1 py-2 no-print bg-gray-100">أسبوع ١</th>
-            <th scope="col" className="px-1 py-2 no-print bg-gray-100">أسبوع ٢</th>
-            <th scope="col" className="px-1 py-2 no-print bg-gray-100">أسبوع ٣</th>
-            <th scope="col" className="px-1 py-2 no-print bg-gray-100">أسبوع ٤</th>
+            <th scope="col" className="px-1 py-2 no-print bg-gray-100 dark:bg-gray-700">أسبوع ١</th>
+            <th scope="col" className="px-1 py-2 no-print bg-gray-100 dark:bg-gray-700">أسبوع ٢</th>
+            <th scope="col" className="px-1 py-2 no-print bg-gray-100 dark:bg-gray-700">أسبوع ٣</th>
+            <th scope="col" className="px-1 py-2 no-print bg-gray-100 dark:bg-gray-700">أسبوع ٤</th>
             <th scope="col" className="px-2 py-2 no-print">تعديل</th>
           </tr>
         </thead>
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={25} className="text-center py-12 text-gray-500 text-lg">
+              <td colSpan={25} className="text-center py-12 text-gray-500 dark:text-gray-400 text-lg">
                 لا توجد أنشطة تطابق بحثك.
               </td>
             </tr>

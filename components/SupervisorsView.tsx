@@ -1,7 +1,7 @@
-import React, { useState, useRef, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useRef, useCallback, lazy, Suspense, useEffect } from 'react';
 import { PlanItem } from '../types';
 import { MONTHS } from '../constants';
-import { PrintIcon, TrashIcon, UserGroupIcon, TableIcon, DocumentReportIcon } from './Icons';
+import { PrintIcon, TrashIcon, UserGroupIcon, TableIcon, DocumentReportIcon, ImportIcon, UpdatePlanIcon, ChevronDownIcon } from './Icons';
 import SupervisorPlanTable from './SupervisorPlanTable';
 import SupervisorReportView from './SupervisorReportView';
 import LoadingSpinner from './LoadingSpinner';
@@ -42,18 +42,31 @@ const parseSupervisorPlan = (data: any[]): PlanItem[] => {
 // Main view component
 interface SupervisorsViewProps {
   plans: { [key: string]: PlanItem[] };
+  defaultPlans: { [key: string]: PlanItem[] };
   onUpdatePlans: (newPlans: { [key: string]: PlanItem[] }) => void;
   selectedMonthIndex: number;
   onUpdateSupervisorPlan: (supervisorName: string, updatedPlan: PlanItem[]) => void;
 }
 
-const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans, selectedMonthIndex, onUpdateSupervisorPlan }) => {
+const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, defaultPlans, onUpdatePlans, selectedMonthIndex, onUpdateSupervisorPlan }) => {
   const [selectedSupervisor, setSelectedSupervisor] = useState<string | null>(Object.keys(plans)[0] || null);
   const [editingItem, setEditingItem] = useState<PlanItem | null>(null);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [localView, setLocalView] = useState<'table' | 'report'>('table');
+  const [isAddDropdownOpen, setIsAddDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const addDropdownRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (addDropdownRef.current && !addDropdownRef.current.contains(event.target as Node)) {
+        setIsAddDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -180,6 +193,20 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans,
       );
       onUpdateSupervisorPlan(selectedSupervisor, updatedPlan);
   }, [selectedSupervisor, plans, onUpdateSupervisorPlan]);
+  
+  const handleAddDefaultPlan = (name: string) => {
+    if (plans[name]) {
+      alert(`خطة المشرف '${name}' موجودة بالفعل.`);
+      return;
+    }
+    const newPlans = {
+      ...plans,
+      [name]: defaultPlans[name],
+    };
+    onUpdatePlans(newPlans);
+    setSelectedSupervisor(name);
+    setIsAddDropdownOpen(false);
+  };
 
 
   const handlePrint = () => {
@@ -187,6 +214,7 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans,
   };
   
   const supervisorNames = Object.keys(plans);
+  const availableDefaultPlans = Object.keys(defaultPlans).filter(name => !plans[name]);
 
   return (
     <div id="report-view">
@@ -214,20 +242,48 @@ const SupervisorsView: React.FC<SupervisorsViewProps> = ({ plans, onUpdatePlans,
           <aside className="w-full md:w-1/4 no-print">
             <div className="p-4 bg-gray-50 rounded-lg border sticky top-40">
                 <h3 className="font-bold text-lg mb-3">قائمة المشرفين</h3>
-                 <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                    onChange={handleFileImport}
-                />
-                <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isLoading}
-                    className="w-full mb-4 px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 disabled:bg-gray-400"
-                >
-                    {isLoading ? 'جاري الاستيراد...' : 'استيراد خطة جديدة (Excel)'}
-                </button>
+                 <div className="mb-4 space-y-2">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        onChange={handleFileImport}
+                    />
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isLoading}
+                        className="w-full px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
+                    >
+                        <ImportIcon />
+                        <span>{isLoading ? 'جاري الاستيراد...' : 'استيراد خطة (Excel)'}</span>
+                    </button>
+
+                    <div className="relative" ref={addDropdownRef}>
+                        <button
+                            onClick={() => setIsAddDropdownOpen(prev => !prev)}
+                            disabled={availableDefaultPlans.length === 0}
+                            className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 flex items-center justify-center gap-2 disabled:bg-gray-400"
+                        >
+                            <UpdatePlanIcon />
+                            <span>إضافة خطة افتراضية</span>
+                            <ChevronDownIcon className={`h-4 w-4 transition-transform ${isAddDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isAddDropdownOpen && availableDefaultPlans.length > 0 && (
+                            <div className="absolute top-full mt-1 w-full bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
+                                {availableDefaultPlans.map(name => (
+                                    <button
+                                        key={name}
+                                        onClick={() => handleAddDefaultPlan(name)}
+                                        className="w-full text-right px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        {name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
                 {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
                 
                 <ul className="space-y-2">

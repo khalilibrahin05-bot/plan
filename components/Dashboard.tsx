@@ -35,13 +35,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onViewChange }) => {
                 <button
                     key={view}
                     onClick={() => onViewChange(view as View)}
-                    className="group flex flex-col items-center justify-center text-center p-6 bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 border-b-4 border-transparent hover:border-primary transition-all duration-300"
+                    className="group flex flex-col items-center justify-center text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 border-b-4 border-transparent hover:border-primary transition-all duration-300"
                 >
                     <div className="text-primary mb-4 transition-transform duration-300 group-hover:scale-110">
                         {React.cloneElement(icon, { className: "h-12 w-12" })}
                     </div>
-                    <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{description}</p>
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">{title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{description}</p>
                 </button>
             ))}
         </div>

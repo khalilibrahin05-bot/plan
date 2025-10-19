@@ -13,7 +13,7 @@ import FontControls from './components/FontControls';
 import Footer from './components/Footer';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { themes } from './themes';
-import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon, GraduationCapIcon, UploadIcon, TrashIcon, ImportIcon } from './components/Icons';
+import { CogIcon, PrintIcon, SaveDataIcon, RefreshIcon, CheckIcon, SyncIcon, HomeIcon, GraduationCapIcon, UploadIcon, TrashIcon, ImportIcon, MoonIcon, SunIcon } from './components/Icons';
 import LoadingSpinner from './components/LoadingSpinner';
 import { MONTHS } from './constants';
 
@@ -33,11 +33,12 @@ const SupervisorsView = lazy(() => import('./components/SupervisorsView'));
 const SummaryView = lazy(() => import('./components/SummaryView'));
 const ControlPanelView = lazy(() => import('./components/ControlPanelView'));
 const StrategicPlanView = lazy(() => import('./components/StrategicPlanView'));
+const CalendarView = lazy(() => import('./components/CalendarView'));
 const EditModal = lazy(() => import('./components/EditModal'));
 const PrintSettingsModal = lazy(() => import('./components/PrintSettingsModal'));
 
 
-export type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors' | 'control-panel' | 'strategic-plan';
+export type View = 'table' | 'report' | 'semester' | 'summary' | 'unified-glossary' | 'events' | 'tools' | 'follow-up' | 'ai-tools' | 'framework' | 'statistics' | 'supervisors' | 'control-panel' | 'strategic-plan' | 'calendar';
 const LOCAL_STORAGE_KEY = 'educationalPlanData';
 const INITIAL_PLAN_DATA_KEY = 'educationalPlanInitialData';
 const STRATEGIC_PLAN_KEY = 'educationalPlanStrategicData';
@@ -46,6 +47,7 @@ const LOGO_STORAGE_KEY = 'educationalPlanLogo';
 const FONT_SETTINGS_KEY = 'educationalPlanFontSettings';
 const PRINT_SETTINGS_KEY = 'educationalPlanPrintSettings';
 const THEME_KEY = 'educationalPlanTheme';
+const DARK_MODE_KEY = 'educationalPlanDarkMode';
 const SUPERVISORS_PLANS_KEY = 'educationalSupervisorsPlansData';
 
 const fontSizes = ['text-sm', 'text-base', 'text-lg', 'text-xl'];
@@ -148,6 +150,9 @@ const App: React.FC = () => {
       return 'blue';
     }
   });
+  
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
 
   const [supervisorsPlans, setSupervisorsPlans] = useState<{[key: string]: PlanItem[]}> (() => {
       try {
@@ -165,6 +170,7 @@ const App: React.FC = () => {
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number>(0);
   const [editingItem, setEditingItem] = useState<PlanItem | null>(null);
   const [editingStrategicItem, setEditingStrategicItem] = useState<PlanItem | null>(null);
+  const [editingContext, setEditingContext] = useState<{ planName: string } | null>(null);
   const [viewMode, setViewMode] = useState<View | 'dashboard'>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [isPrintSettingsModalOpen, setIsPrintSettingsModalOpen] = useState(false);
@@ -235,6 +241,31 @@ const App: React.FC = () => {
 
   useEffect(() => {
     try {
+      const savedMode = localStorage.getItem(DARK_MODE_KEY);
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initialMode = savedMode ? JSON.parse(savedMode) : prefersDark;
+      setIsDarkMode(initialMode);
+    } catch (error) {
+      console.error("Failed to load dark mode setting from localStorage", error);
+      setIsDarkMode(false);
+    }
+  }, []);
+  
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    try {
+      localStorage.setItem(DARK_MODE_KEY, JSON.stringify(isDarkMode));
+    } catch (error) {
+      console.error("Failed to save dark mode setting to localStorage", error);
+    }
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    try {
         const savedLogo = localStorage.getItem(LOGO_STORAGE_KEY);
         if (savedLogo) {
             setLogoSrc(savedLogo);
@@ -260,6 +291,7 @@ const App: React.FC = () => {
       localStorage.setItem(FONT_SETTINGS_KEY, JSON.stringify(fontSettings));
       localStorage.setItem(PRINT_SETTINGS_KEY, JSON.stringify(printSettings));
       localStorage.setItem(THEME_KEY, themeId);
+      localStorage.setItem(DARK_MODE_KEY, JSON.stringify(isDarkMode));
       localStorage.setItem(SUPERVISORS_PLANS_KEY, JSON.stringify(supervisorsPlans));
       
       setTimeout(() => {
@@ -272,7 +304,7 @@ const App: React.FC = () => {
       console.error("Failed to manually save data to localStorage", error);
       setSaveStatus('idle');
     }
-  }, [planData, strategicPlan, fontSettings, printSettings, themeId, supervisorsPlans]);
+  }, [planData, strategicPlan, fontSettings, printSettings, themeId, isDarkMode, supervisorsPlans]);
   
   const handleSyncData = useCallback(() => {
     setSyncStatus('syncing');
@@ -305,6 +337,10 @@ const App: React.FC = () => {
       // Theme
       const savedTheme = localStorage.getItem(THEME_KEY);
       if (savedTheme) setThemeId(savedTheme);
+
+      // Dark Mode
+      const savedMode = localStorage.getItem(DARK_MODE_KEY);
+      if (savedMode) setIsDarkMode(JSON.parse(savedMode));
       
       // Logo
       const savedLogo = localStorage.getItem(LOGO_STORAGE_KEY);
@@ -409,6 +445,8 @@ const App: React.FC = () => {
       setThemeId(id);
   }, []);
 
+  const handleDarkModeToggle = () => setIsDarkMode(prev => !prev);
+
   const handleFontSizeChange = useCallback((direction: 'increase' | 'decrease') => {
     setFontSettings(prev => {
         const newIndex = direction === 'increase'
@@ -426,21 +464,81 @@ const App: React.FC = () => {
     setSelectedMonthIndex(index);
   }, []);
 
-  const handleEditItem = useCallback((item: PlanItem) => {
+  const handleUpdateSupervisorPlan = useCallback((supervisorName: string, updatedPlan: PlanItem[]) => {
+    setSupervisorsPlans(prevPlans => ({
+      ...prevPlans,
+      [supervisorName]: updatedPlan
+    }));
+  }, []);
+  
+  const handleEditItem = useCallback((item: PlanItem, planName: string = 'main_plan') => {
     setEditingItem(item);
+    setEditingContext({ planName });
   }, []);
 
   const handleCloseModal = useCallback(() => {
     setEditingItem(null);
+    setEditingContext(null);
   }, []);
 
   const handleSaveItem = useCallback((updatedItem: PlanItem) => {
-    setPlanData(prevData =>
-      prevData.map(item => (item.id === updatedItem.id ? updatedItem : item))
-    );
+    const contextPlanName = editingContext?.planName;
+
+    if (contextPlanName && contextPlanName !== 'main_plan') {
+        // Editing a supervisor plan item
+        const supervisorName = contextPlanName;
+        const plan = supervisorsPlans[supervisorName];
+        if (!plan) return;
+
+        const itemExists = plan.some(item => item.id === updatedItem.id);
+        let updatedPlan: PlanItem[];
+
+        if (itemExists) {
+            updatedPlan = plan.map(item => (item.id === updatedItem.id ? updatedItem : item));
+        } else {
+            updatedPlan = [...plan, updatedItem];
+        }
+        
+        // Recalculate planned total
+        updatedPlan = updatedPlan.map(item => ({
+            ...item,
+            planned: item.schedule.reduce((sum, val) => sum + (val || 0), 0)
+        }));
+
+
+        handleUpdateSupervisorPlan(supervisorName, updatedPlan);
+
+    } else { // main_plan or null context for adding to main plan
+        setPlanData(prevData => {
+            const itemExists = prevData.some(item => item.id === updatedItem.id);
+            if (itemExists) {
+                return prevData.map(item => (item.id === updatedItem.id ? updatedItem : item));
+            } else {
+                return [...prevData, updatedItem];
+            }
+        });
+    }
     setEditingItem(null);
-  }, []);
+    setEditingContext(null);
+  }, [supervisorsPlans, editingContext, handleUpdateSupervisorPlan]);
   
+  const handleAddItemToMainPlan = useCallback((domain: string) => {
+    const newItem: PlanItem = {
+        id: crypto.randomUUID(),
+        domain: domain,
+        objective: '',
+        indicator: '',
+        evidence: '',
+        activity: '',
+        planned: 0,
+        schedule: Array(12).fill(null),
+        executed: 0,
+        indicatorCount: null,
+        weeklyExecution: [null, null, null, null],
+    };
+    setEditingItem(newItem);
+  }, []);
+
     const handleEditStrategicItem = useCallback((item: PlanItem) => {
         setEditingStrategicItem(item);
     }, []);
@@ -510,13 +608,6 @@ const App: React.FC = () => {
   const handleUpdateSupervisorsPlans = useCallback((newPlans: {[key: string]: PlanItem[]}) => {
     setSupervisorsPlans(newPlans);
   }, []);
-  
-  const handleUpdateSupervisorPlan = useCallback((supervisorName: string, updatedPlan: PlanItem[]) => {
-    setSupervisorsPlans(prevPlans => ({
-      ...prevPlans,
-      [supervisorName]: updatedPlan
-    }));
-  }, []);
 
 
   const filteredData = useMemo(() => {
@@ -536,6 +627,14 @@ const App: React.FC = () => {
     switch(viewMode) {
       case 'table':
         return <PlanTable data={filteredData} selectedMonthIndex={selectedMonthIndex} onEdit={handleEditItem} printSettings={printSettings} isPrinting={isPrinting} onPrintComplete={() => setIsPrinting(false)} />;
+      case 'calendar':
+        return <CalendarView 
+                    mainPlan={planData} 
+                    supervisorsPlans={supervisorsPlans}
+                    selectedMonthIndex={selectedMonthIndex} 
+                    onEdit={handleEditItem} 
+                    onAdd={handleAddItemToMainPlan} 
+                />;
       case 'report':
         return <ReportView data={filteredData} selectedMonthIndex={selectedMonthIndex} onWeeklyExecutionChange={handleWeeklyExecutionChange} />;
       case 'semester':
@@ -559,6 +658,7 @@ const App: React.FC = () => {
       case 'supervisors':
         return <SupervisorsView 
                     plans={supervisorsPlans} 
+                    defaultPlans={defaultSupervisorPlans}
                     onUpdatePlans={handleUpdateSupervisorsPlans}
                     selectedMonthIndex={selectedMonthIndex}
                     onUpdateSupervisorPlan={handleUpdateSupervisorPlan}
@@ -579,8 +679,8 @@ const App: React.FC = () => {
 
 
   return (
-    <div className={`min-h-screen bg-gray-50 text-gray-800 ${fontSizes[fontSettings.fontSizeIndex]} ${fontSettings.fontFamily}`}>
-      <header className="bg-white shadow-md sticky top-0 z-20 no-print">
+    <div className={`min-h-screen bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 ${fontSizes[fontSettings.fontSizeIndex]} ${fontSettings.fontFamily}`}>
+      <header className="bg-white shadow-md dark:bg-gray-800 dark:shadow-slate-700/50 sticky top-0 z-20 no-print">
         <div className="container mx-auto px-4 py-4 space-y-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
              <div className="flex items-center gap-4">
@@ -595,8 +695,8 @@ const App: React.FC = () => {
                     {logoSrc ? (
                         <img src={logoSrc} alt="شعار المدرسة" className="h-14 w-14 object-contain rounded-full bg-white shadow-sm" />
                     ) : (
-                        <div className="h-14 w-14 flex items-center justify-center bg-gray-200 rounded-full">
-                            <GraduationCapIcon className="h-8 w-8 text-gray-500" />
+                        <div className="h-14 w-14 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full">
+                            <GraduationCapIcon className="h-8 w-8 text-gray-500 dark:text-gray-400" />
                         </div>
                     )}
                     <div 
@@ -617,13 +717,13 @@ const App: React.FC = () => {
                         )}
                     </div>
                 </div>
-                <h1 className="text-xl lg:text-2xl font-bold text-gray-700 text-center md:text-right">
+                <h1 className="text-xl lg:text-2xl font-bold text-gray-700 dark:text-gray-200 text-center md:text-right">
                 {viewMode === 'dashboard' ? 'لوحة التحكم الرئيسية' : 'خطة قسم الإشراف التربوي للعام الدراسي ٢٠٢٥م-٢٠٢٦م / ١٤٤٧هـ'}
                 </h1>
             </div>
              {viewMode !== 'dashboard' && (
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <button onClick={() => setViewMode('dashboard')} className="flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary font-semibold rounded-md hover:bg-primary/20" title="العودة للوحة التحكم">
+                    <button onClick={() => setViewMode('dashboard')} className="flex items-center gap-2 px-3 py-2 bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-300 font-semibold rounded-md hover:bg-primary/20 dark:hover:bg-primary/30" title="العودة للوحة التحكم">
                         <HomeIcon />
                         <span>الرئيسية</span>
                     </button>
@@ -644,13 +744,13 @@ const App: React.FC = () => {
                         currentView={viewMode as View}
                         onViewChange={handleViewChange}
                     />
-                    <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
-                        <button onClick={handleManualSave} className={`flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm transition-all duration-300 ${saveStatus === 'saved' ? 'bg-green-500 text-white' : 'hover:bg-gray-200'}`} title="حفظ التغييرات" disabled={saveStatus !== 'idle'}>
+                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-lg">
+                        <button onClick={handleManualSave} className={`flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm transition-all duration-300 ${saveStatus === 'saved' ? 'bg-green-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-600'}`} title="حفظ التغييرات" disabled={saveStatus !== 'idle'}>
                             {saveStatus === 'idle' && <><SaveDataIcon /><span>حفظ</span></>}
                             {saveStatus === 'saving' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
                             {saveStatus === 'saved' && <><CheckIcon /><span>تم الحفظ</span></>}
                         </button>
-                        <button onClick={handleSyncData} className={`flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm transition-all duration-300 ${syncStatus === 'synced' ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'}`} title="مزامنة البيانات من التخزين المحلي (مفيد عند فتح التطبيق في أكثر من نافذة)" disabled={syncStatus !== 'idle'}>
+                        <button onClick={handleSyncData} className={`flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm transition-all duration-300 ${syncStatus === 'synced' ? 'bg-blue-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-600'}`} title="مزامنة البيانات من التخزين المحلي (مفيد عند فتح التطبيق في أكثر من نافذة)" disabled={syncStatus !== 'idle'}>
                             {syncStatus === 'idle' && <><SyncIcon /><span>مزامنة</span></>}
                             {syncStatus === 'syncing' && <div className="w-4 h-4 border-2 border-transparent border-t-primary rounded-full animate-spin"></div>}
                             {syncStatus === 'synced' && <><CheckIcon /><span>تمت المزامنة</span></>}
@@ -662,22 +762,22 @@ const App: React.FC = () => {
                             className="hidden"
                             accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                         />
-                        <button onClick={() => planFileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-green-600 hover:text-green-700" title="استبدال الخطة الحالية بخطة جديدة من ملف Excel">
+                        <button onClick={() => planFileInputRef.current?.click()} className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 text-sm text-green-600 hover:text-green-700" title="استبدال الخطة الحالية بخطة جديدة من ملف Excel">
                             <ImportIcon />
                             <span>استبدال الخطة</span>
                         </button>
-                        <button onClick={handleRefreshData} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm text-red-600 hover:text-red-700" title="إعادة تعيين الخطة إلى حالتها الأصلية (سيتم فقدان التغييرات)">
+                        <button onClick={handleRefreshData} className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 text-sm text-red-600 hover:text-red-700" title="إعادة تعيين الخطة إلى حالتها الأصلية (سيتم فقدان التغييرات)">
                             <RefreshIcon />
                             <span>إعادة تعيين</span>
                         </button>
                     </div>
                     {viewMode === 'table' && (
-                    <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
-                        <button onClick={() => setIsPrinting(true)} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm" title="طباعة الجدول">
+                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-lg">
+                        <button onClick={() => setIsPrinting(true)} className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 text-sm" title="طباعة الجدول">
                         <PrintIcon />
                         <span>طباعة</span>
                         </button>
-                        <button onClick={() => setIsPrintSettingsModalOpen(true)} className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-200 text-sm" title="إعدادات الطباعة">
+                        <button onClick={() => setIsPrintSettingsModalOpen(true)} className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 text-sm" title="إعدادات الطباعة">
                         <CogIcon />
                         </button>
                     </div>
@@ -692,6 +792,9 @@ const App: React.FC = () => {
                         currentThemeId={themeId}
                         onThemeChange={handleThemeChange}
                     />
+                    <button onClick={handleDarkModeToggle} className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" title={isDarkMode ? "الوضع الفاتح" : "الوضع الداكن"}>
+                        {isDarkMode ? <SunIcon className="h-5 w-5"/> : <MoonIcon className="h-5 w-5"/>}
+                    </button>
                 </div>
             </div>
           )}
